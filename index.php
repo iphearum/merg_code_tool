@@ -7,16 +7,14 @@ if(isset( $post->ID)){
 }else{
     $post_id = '';
 }
-$options=wpestate_page_details($post_id);
 
-
-$blog_unit          =   esc_html ( get_option('wp_estate_blog_unit','') ); 
+$wpestate_options   =   wpestate_page_details($post_id);
+$blog_unit          =   esc_html ( wpresidence_get_option('wp_estate_blog_unit','') ); 
 ?>
 
 <div id="post" <?php post_class('row');?>>
     <?php get_template_part('templates/breadcrumbs'); ?>
-    
-    <div class=" col-xs-12  <?php print esc_html($options['content_class']);?> ">
+    <div class=" col-xs-12  <?php print esc_html($wpestate_options['content_class']);?> ">
         <?php get_template_part('templates/ajax_container'); ?>  
         <div class="single-content blog_list_wrapper">
 
@@ -32,24 +30,24 @@ $blog_unit          =   esc_html ( get_option('wp_estate_blog_unit','') );
         if($blog_selection->have_posts()){
             while ($blog_selection->have_posts()): $blog_selection->the_post();
                 if($blog_unit=='list'){
-                    get_template_part('templates/blog_unit');
+                     include( locate_template('templates/blog_unit.php') ) ;
                 }else{
-                    get_template_part('templates/blog_unit2');
-                }       
+                     include( locate_template('templates/blog_unit2.php') ) ;
+                }      
             endwhile;
             wp_reset_query();
         }else{
-            print '<h3 class="noposts">'.__('There are no posts published!','wpestate').'</h3>';
+            print '<h3 class="noposts">'.esc_html__('There are no posts published!','wpresidence').'</h3>';
         }
        
         ?>
 
          
         </div><!-- single content-->
-         <?php kriesi_pagination($blog_selection->max_num_pages, $range = 2); ?>  
+         <?php wpestate_pagination($blog_selection->max_num_pages, $range = 2); ?>  
     </div><!-- end 9col container-->
     
-<?php  include(locate_template('sidebar.php')); ?>
+<?php  include get_theme_file_path('sidebar.php'); ?>
 </div>   
 
 <?php get_footer(); ?>

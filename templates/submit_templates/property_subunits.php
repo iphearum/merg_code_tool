@@ -3,17 +3,17 @@
 global $property_has_subunits;
 global $property_subunits_list;
 global $edit_id;
-global $submission_page_fields;
+global $wpestate_submission_page_fields;
 
 ?>
 
-<?php if(   is_array($submission_page_fields) && in_array('property_subunits_list', $submission_page_fields)) { ?>
+<?php if(   is_array($wpestate_submission_page_fields) && in_array('property_subunits_list', $wpestate_submission_page_fields)) { ?>
     <div class="col-md-12 add-estate profile-page profile-onprofile row"> 
   
         <div class="submit_container">
             <div class="col-md-4 profile_label">
-                <div class="user_details_row"><?php _e('Subunits','wpestate');?></div> 
-                <div class="user_profile_explain"><?php _e('Select what properties you wish to show as subunits from those published.','wpestate')?></div>
+                <div class="user_details_row"><?php esc_html_e('Subunits','wpresidence');?></div> 
+                <div class="user_profile_explain"><?php esc_html_e('Select what properties you wish to show as subunits from those published.','wpresidence')?></div>
 
                 <p class="full_form">
                     <input type="hidden" name="property_has_subunits" value="">
@@ -24,14 +24,14 @@ global $submission_page_fields;
                             }
                         ?>     
                         />
-                    <label class="checklabel" for="property_has_subunits"><?php _e('Enable ','wpestate');?></label>
+                    <label class="checklabel" for="property_has_subunits"><?php esc_html_e('Enable ','wpresidence');?></label>
                 </p>
             </div>
 
             <div class="col-md-8">     
                 <p class="full_form">
 
-                    <label for="property_subunits_list"><?php _e('Select Subunits From the list: ','wpestate'); ?></label>
+                    <label for="property_subunits_list"><?php esc_html_e('Select Subunits From the list: ','wpresidence'); ?></label>
                     <?php
 
 

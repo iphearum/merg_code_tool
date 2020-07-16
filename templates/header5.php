@@ -2,51 +2,51 @@
 global $wide_header_class;
 global $show_top_bar_user_login; 
 global $logo_header_type;
-$show_top_bar_user_login    =   esc_html ( get_option('wp_estate_show_top_bar_user_login','') );
-$logo                       =   get_option('wp_estate_logo_image','');  
-$stikcy_logo_image          =   esc_html( get_option('wp_estate_stikcy_logo_image','') );
+$show_top_bar_user_login    =   esc_html ( wpresidence_get_option('wp_estate_show_top_bar_user_login','') );
+$logo                       =   wpresidence_get_option('wp_estate_logo_image','url');  
+$stikcy_logo_image          =   esc_html( wpresidence_get_option('wp_estate_stikcy_logo_image','url') );
 ?>
 
 <div class="header_5_inside">
-    <div class="header5_top_row" data-logo="<?php echo  $logo;?>" data-sticky-logo="<?php echo $stikcy_logo_image; ?>">
-        <div class="logo col-md-3" >
+    <div class="header5_top_row" data-logo="<?php print  esc_attr($logo);?>" data-sticky-logo="<?php print esc_attr($stikcy_logo_image); ?>">
+        <div class="logo col-md-4" >
             <a href="<?php
-                $splash_page_logo_link   =   get_option('wp_estate_splash_page_logo_link','');  
+                $splash_page_logo_link   =   wpresidence_get_option('wp_estate_splash_page_logo_link','');  
                 if( is_page_template( 'splash_page.php' ) && $splash_page_logo_link!='' ){
-                    echo $splash_page_logo_link;
+                    print esc_url($splash_page_logo_link);
                 }else{
-                    echo home_url('','login');
+                    print esc_url ( home_url('','login') );
                 }
-                echo '">';
+                print '">';
                 if ( $logo!='' ){
-                   print '<img id="logo_image" src="'.$logo.'" class="img-responsive retina_ready" alt="logo"/>';	
+                   print '<img id="logo_image" src="'.esc_url($logo).'" class="img-responsive retina_ready" alt="'.esc_html__('image','wpresidence').'"/>';	
                 } else {
-                   print '<img id="logo_image" class="img-responsive retina_ready" src="'. get_template_directory_uri().'/img/logo.png" alt="logo"/>';
+                   print '<img id="logo_image" class="img-responsive retina_ready" src="'. get_theme_file_uri('/img/logo.png').'" alt="logo"/>';
                 }
                 ?>
             </a>
             
         </div>
         
-        <div class="col-md-9 header_5_widget_wrap">
+        <div class="col-md-8 header_5_widget_wrap">
             <?php
-            $header5_info_widget1_icon   =   get_option('wp_estate_header5_info_widget1_icon','');
-            $header5_info_widget1_text1   =   get_option('wp_estate_header5_info_widget1_text1','');
-            $header5_info_widget1_text2   =   get_option('wp_estate_header5_info_widget1_text2','');
+            $header5_info_widget1_icon   =   wpresidence_get_option('wp_estate_header5_info_widget1_icon','');
+            $header5_info_widget1_text1   =   wpresidence_get_option('wp_estate_header5_info_widget1_text1','');
+            $header5_info_widget1_text2   =   wpresidence_get_option('wp_estate_header5_info_widget1_text2','');
             if($header5_info_widget1_icon!='' || $header5_info_widget1_text1!=''){
             ?>
             
             <div class="header_5_widget">
                 <div class="header_5_widget_icon">
-                    <i class="<?php echo $header5_info_widget1_icon;?>"></i>
+                    <i class="<?php print esc_attr($header5_info_widget1_icon);?>"></i>
                 </div>
                 
                 <div class="header_5_widget_text_wrapper">
                     <div class="header_5_widget_text">
-                        <?php echo $header5_info_widget1_text1;?>
+                        <?php print trim($header5_info_widget1_text1);?>
                     </div>
                     <div class="header_5_widget_text">
-                        <?php echo $header5_info_widget1_text2;?>
+                        <?php print trim($header5_info_widget1_text2);?>
                     </div>
                 </div>
                 
@@ -55,23 +55,23 @@ $stikcy_logo_image          =   esc_html( get_option('wp_estate_stikcy_logo_imag
             <?php } ?>
             
              <?php
-            $header5_info_widget2_icon   =   get_option('wp_estate_header5_info_widget2_icon','');
-            $header5_info_widget2_text1   =   get_option('wp_estate_header5_info_widget2_text1','');
-            $header5_info_widget2_text2   =   get_option('wp_estate_header5_info_widget2_text2','');
+            $header5_info_widget2_icon   =   wpresidence_get_option('wp_estate_header5_info_widget2_icon','');
+            $header5_info_widget2_text1   =   wpresidence_get_option('wp_estate_header5_info_widget2_text1','');
+            $header5_info_widget2_text2   =   wpresidence_get_option('wp_estate_header5_info_widget2_text2','');
             if($header5_info_widget2_icon!='' || $header5_info_widget2_text1!=''){
             ?>
             
             <div class="header_5_widget">
                 <div class="header_5_widget_icon">
-                    <i class="<?php echo $header5_info_widget2_icon;?>"></i>
+                    <i class="<?php print esc_attr($header5_info_widget2_icon);?>"></i>
                 </div>
                 
                 <div class="header_5_widget_text_wrapper">
                     <div class="header_5_widget_text">
-                        <?php echo $header5_info_widget2_text1;?>
+                        <?php print trim($header5_info_widget2_text1);?>
                     </div>
                     <div class="header_5_widget_text">
-                        <?php echo $header5_info_widget2_text2;?>
+                        <?php print trim($header5_info_widget2_text2);?>
                     </div>
                 </div>
                 
@@ -82,23 +82,23 @@ $stikcy_logo_image          =   esc_html( get_option('wp_estate_stikcy_logo_imag
             
             
             <?php
-            $header5_info_widget3_icon   =   get_option('wp_estate_header5_info_widget3_icon','');
-            $header5_info_widget3_text1   =   get_option('wp_estate_header5_info_widget3_text1','');
-            $header5_info_widget3_text2   =   get_option('wp_estate_header5_info_widget3_text2','');
+            $header5_info_widget3_icon   =   wpresidence_get_option('wp_estate_header5_info_widget3_icon','');
+            $header5_info_widget3_text1   =   wpresidence_get_option('wp_estate_header5_info_widget3_text1','');
+            $header5_info_widget3_text2   =   wpresidence_get_option('wp_estate_header5_info_widget3_text2','');
             if($header5_info_widget3_icon!='' || $header5_info_widget3_text1!=''){
             ?>
             
             <div class="header_5_widget">
                 <div class="header_5_widget_icon">
-                    <i class="<?php echo $header5_info_widget3_icon;?>"></i>
+                    <i class="<?php print esc_attr($header5_info_widget3_icon);?>"></i>
                 </div>
                 
                 <div class="header_5_widget_text_wrapper">
                     <div class="header_5_widget_text">
-                        <?php echo $header5_info_widget3_text1;?>
+                        <?php print trim($header5_info_widget3_text1);?>
                     </div>
                     <div class="header_5_widget_text">
-                        <?php echo $header5_info_widget3_text2;?>
+                        <?php print trim($header5_info_widget3_text2);?>
                     </div>
                 </div>
                 
@@ -111,9 +111,6 @@ $stikcy_logo_image          =   esc_html( get_option('wp_estate_stikcy_logo_imag
        
     <div class="header5_bottom_row_wrapper">
         <div class="header5_bottom_row">
-               
-
-
             <nav id="access">
                 <?php 
                     wp_nav_menu( 
@@ -128,7 +125,7 @@ $stikcy_logo_image          =   esc_html( get_option('wp_estate_stikcy_logo_imag
           
             if( $show_top_bar_user_login == "yes"){
                 print '<div class="header5_user_wrap">';
-                get_template_part('templates/top_user_menu');  
+                include( locate_template('templates/top_user_menu.php') );  
                 print '</div>';
                 
             }
@@ -136,5 +133,4 @@ $stikcy_logo_image          =   esc_html( get_option('wp_estate_stikcy_logo_imag
             
         </div>
     </div>
-
 </div>

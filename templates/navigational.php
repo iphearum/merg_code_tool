@@ -16,8 +16,8 @@ if (is_single() ){
     <?php if( $template_pr !=''){?>
             <div class="nav-prev-wrapper">
                 <div class="nav-prev">
-                    <?php print $template_pr; // previous_post_link('%link', '%title',false);?>
-                    <i class="fa fa-angle-left"></i>           
+                    <?php print wp_kses_post($template_pr); ?>
+                    <i class="fas fa-angle-left"></i>           
                 </div>
             </div>
     <?php } ?>
@@ -25,8 +25,8 @@ if (is_single() ){
     <?php if( $template_nxt !=''){?>
             <div class="nav-next-wrapper">
                  <div class="nav-next">    
-                     <i class="fa fa-angle-right"></i>
-                     <?php print $template_nxt;// next_post_link('%link',' %title',false);  ?>
+                     <i class="fas fa-angle-right"></i>
+                     <?php print wp_kses_post($template_nxt); ?>
                  </div>
             </div>  
     <?php }?>

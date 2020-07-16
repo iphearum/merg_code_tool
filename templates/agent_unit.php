@@ -1,105 +1,83 @@
 <?php
-global $options;
-
-$thumb_id           = get_post_thumbnail_id($post->ID);
-$preview            = wp_get_attachment_image_src(get_post_thumbnail_id(), 'property_listings');
-$agent_skype        = esc_html( get_post_meta($post->ID, 'agent_skype', true) );
-$agent_phone        = esc_html( get_post_meta($post->ID, 'agent_phone', true) );
-$agent_mobile       = esc_html( get_post_meta($post->ID, 'agent_mobile', true) );
-$agent_email        = esc_html( get_post_meta($post->ID, 'agent_email', true) );
-
-$agent_posit        = esc_html( get_post_meta($post->ID, 'agent_position', true) );
-                    
-$agent_facebook     = esc_html( get_post_meta($post->ID, 'agent_facebook', true) );
-$agent_twitter      = esc_html( get_post_meta($post->ID, 'agent_twitter', true) );
-$agent_linkedin     = esc_html( get_post_meta($post->ID, 'agent_linkedin', true) );
-$agent_pinterest    = esc_html( get_post_meta($post->ID, 'agent_pinterest', true) );
-$agent_instagram    = esc_html( get_post_meta($post->ID, 'agent_instagram', true) );
-$name               = get_the_title();
-$link               = get_permalink();
-
+global $wpestate_options;
+$agent_details =wpestate_return_agent_details('',$post->ID);
 $extra= array(
-        'data-original'=>$preview[0],
         'class'	=> 'lazyload img-responsive',    
         );
 $thumb_prop    = get_the_post_thumbnail($post->ID, 'property_listings',$extra);
 
+
 if($thumb_prop==''){
-    $thumb_prop = '<img src="'.get_template_directory_uri().'/img/default_user.png" alt="agent-images">';
+    $thumb_prop = '<img src="'.get_theme_file_uri('/img/default_user.png').'" alt="'.esc_html__('user image','wpresidence').'">';
 }
-
-$col_class=4;
-if($options['content_class']=='col-md-12'){
-    $col_class=3;
-}
-
-
-           
 ?>
-
-
-
-
-    <div class="agent_unit" data-link="<?php print esc_url($link);?>">
+    <div class="agent_unit" data-link="<?php print esc_attr($agent_details['link']);?>">
         <div class="agent-unit-img-wrapper">
-            <div class="prop_new_details_back"></div>
+            <?php ?>
+            <div class="agent_card_my_listings">
+                <?php print intval($agent_details['counter']).' '; 
+                    if($agent_details['counter']!=1){
+                        esc_html_e('listings','wpresidence');
+                    }else{
+                        esc_html_e('listing','wpresidence');
+                    }
+                ?>
+            </div>
+      
+            
+            
+         
             <?php 
-                print $thumb_prop; 
+                print trim($thumb_prop); 
             ?>
         </div>    
             
-        <div class="">
-            <?php
-            print '<h4> <a href="' . $link . '">' . $name. '</a></h4>
-            <div class="agent_position">'. $agent_posit .'</div>';
-           
-            if ($agent_phone) {
-                print '<div class="agent_detail"><i class="fa fa-phone"></i>' . $agent_phone . '</div>';
-            }
-            if ($agent_mobile) {
-                print '<div class="agent_detail"><i class="fa fa-mobile"></i>' . $agent_mobile . '</div>';
-            }
 
-            if ($agent_email) {
-                print '<div class="agent_detail"><i class="fa fa-envelope-o"></i>' . $agent_email . '</div>';
-            }
+        <?php
+        print '<h4> <a href="'.esc_url($agent_details['link']).'">'.esc_html($agent_details['realtor_name']).'</a></h4>
+        <div class="agent_position">'.esc_html($agent_details['realtor_position']).'</div>';
 
-            if ($agent_skype) {
-                print '<div class="agent_detail"><i class="fa fa-skype"></i>' . $agent_skype . '</div>';
-            }
-            ?>
-        </div> 
-    
-        
+        print '<div class="agent_card_content">'. wpestate_strip_excerpt_by_char(get_the_excerpt(),90,$post->ID,'...').'</div>';
+        ?>
+
+     
+       
         <div class="agent_unit_social agent_list">
-           <div class="social-wrapper"> 
+        
                
                <?php
                
-                if($agent_facebook!=''){
-                    print ' <a href="'. $agent_facebook.'"><i class="fa fa-facebook"></i></a>';
+                if($agent_details['realtor_facebook']!=''){
+                    print ' <a class="agent_unit_facebook" href="'. esc_url($agent_details['realtor_facebook']).'"><i class="fab fa-facebook-f"></i></a>';
                 }
 
-                if($agent_twitter!=''){
-                    print ' <a href="'.$agent_twitter.'"><i class="fa fa-twitter"></i></a>';
+                if($agent_details['realtor_twitter']!=''){
+                    print ' <a  class="agent_unit_twitter" href="'.esc_url($agent_details['realtor_twitter']).'"><i class="fab fa-twitter"></i></a>';
                 }
                 
-                if($agent_linkedin!=''){
-                    print ' <a href="'.$agent_linkedin.'"><i class="fa fa-linkedin"></i></a>';
+                if($agent_details['realtor_linkedin']!=''){
+                    print ' <a  class="agent_unit_linkedin" href="'.esc_url($agent_details['realtor_linkedin']).'"><i class="fab fa-linkedin-in"></i></a>';
                 }
                 
-                if($agent_pinterest!=''){
-                    print ' <a href="'. $agent_pinterest.'"><i class="fa fa-pinterest"></i></a>';
+                if($agent_details['realtor_pinterest']!=''){
+                    print ' <a  class="agent_unit_pinterest" href="'. esc_url($agent_details['realtor_pinterest']).'"><i class="fab fa-pinterest-p"></i></a>';
                 }
                 
-                if($agent_instagram!=''){
-                    print ' <a href="'. $agent_instagram.'"><i class="fa fa-instagram"></i></a>';
+                if($agent_details['realtor_instagram']!=''){
+                    print ' <a  class="agent_unit_instagram" href="'. esc_url($agent_details['realtor_instagram']).'"><i class="fab fa-instagram"></i></a>';
                 }
-
-               
-               ?>
-              
-            </div>
+                
+                if($agent_details['realtor_phone']!=''){
+                    print '<div class="agent_unit_phone"><a href="tel:'.esc_html( $agent_details['realtor_phone']).'"><i class="fas fa-phone"></i></a></div>';
+                }
+                
+                if($agent_details['email']!=''){
+                    //'.esc_html($agent_details['email']).'</a>
+                    print '<div class="agent_unit_email"><a href="mailto:'.esc_html($agent_details['email']).'"><i class="fas fa-envelope"></i></a></div>';
+                }
+                
+                ?>
+           
         </div>
     </div>
 <!-- </div>    -->

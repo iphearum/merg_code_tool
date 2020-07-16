@@ -1,15 +1,15 @@
 <?php 
 global $post;
 global $adv_search_type;
-$adv_search_what            =   get_option('wp_estate_adv_search_what','');
-$show_adv_search_visible    =   get_option('wp_estate_show_adv_search_visible','');
+$adv_search_what            =   wpresidence_get_option('wp_estate_adv_search_what','');
+$show_adv_search_visible    =   wpresidence_get_option('wp_estate_show_adv_search_visible','');
 $close_class                =   '';
 
 if($show_adv_search_visible=='no'){
     $close_class='adv-search-1-close';
 }
 
-$extended_search    =   get_option('wp_estate_show_adv_search_extended','');
+$extended_search    =   wpresidence_get_option('wp_estate_show_adv_search_extended','');
 $extended_class     =   '';
 
 if ($adv_search_type==2){
@@ -23,22 +23,15 @@ if ( $extended_search =='yes' ){
     }
        
 }
-$adv6_taxonomy          =   get_option('wp_estate_adv6_taxonomy');
-$adv6_taxonomy_terms    =   get_option('wp_estate_adv6_taxonomy_terms');     
-$adv6_max_price         =   get_option('wp_estate_adv6_max_price');     
-$adv6_min_price         =   get_option('wp_estate_adv6_min_price');     
+$adv6_taxonomy          =   wpresidence_get_option('wp_estate_adv6_taxonomy');
+$adv6_taxonomy_terms    =   wpresidence_get_option('wp_estate_adv6_taxonomy_terms');     
+$adv6_max_price         =   wpresidence_get_option('wp_estate_adv6_max_price');     
+$adv6_min_price         =   wpresidence_get_option('wp_estate_adv6_min_price');     
 $allowed_html=array();
 
 ?>
+<div class="adv-search-1 <?php echo esc_attr($close_class.' '.$extended_class);?>" id="adv-search-9" > 
 
- 
-
-
-<div class="adv-search-1 <?php echo esc_html($close_class.' '.$extended_class);?>" id="adv-search-9" > 
-    
-
-    
- 
         <?php
         if (function_exists('icl_translate') ){
             print do_action( 'wpml_add_language_form_field' );
@@ -48,12 +41,10 @@ $allowed_html=array();
         
         <div class="adv9-holder">
             <?php
-            $custom_advanced_search         =   get_option('wp_estate_custom_advanced_search','');
-            $adv_search_fields_no_per_row   =   ( floatval( get_option('wp_estate_search_fields_no_per_row') ) );
+            $custom_advanced_search         =   wpresidence_get_option('wp_estate_custom_advanced_search','');
+            $adv_search_fields_no_per_row   =   ( floatval( wpresidence_get_option('wp_estate_search_fields_no_per_row') ) );
            
-                
-                  
-                    print '<div role="tabpanel" class="adv_search_tab" id="tab_prpg_adv6">';
+                    print '<div role="tabpanel" class="adv_search_tab '.wpestate_search_tab_align().' " id="tab_prpg_adv6">';
                     
                         $tab_items      =   '';
                         $tab_content    =   '';
@@ -72,30 +63,30 @@ $allowed_html=array();
                                 $active         =   'active';
                             }
                                 
-                            $tab_items.= '<div class="adv_search_tab_item '.$active.' '.$use_name.'" data-term="'.$use_name.'" data-termid="'.$term_id.'" data-tax="'.$adv6_taxonomy.'">
+                            $tab_items.= '<div class="adv_search_tab_item '.esc_attr($active).' '.esc_attr($use_name).'" data-term="'.esc_attr($use_name).'" data-termid="'.esc_attr($term_id).'" data-tax="'.esc_attr($adv6_taxonomy).'">
                             <a href="#'.urldecode($use_name).'" aria-controls="'.urldecode($use_name).'" role="tab" class="adv6_tab_head" data-toggle="tab">'.urldecode (str_replace("-"," ",$use_title_name)).'</a>
                             </div>';
                             
                           
                             $tab_content.='  
-                            <div role="tabpanel" class="tab-pane '.$active.'" id="'.urldecode($use_name).'">
+                            <div role="tabpanel" class="tab-pane '.esc_attr($active).'" id="'.urldecode($use_name).'">
                                 <form  role="search" method="get" action="'.esc_url($adv_submit).'" >';
                                     
                                     if($adv6_taxonomy=='property_category'){
-                                        $tab_content.='<input type="hidden" class="picked_tax" name="filter_search_type[]" value="'.$use_name.'" >';
+                                        $tab_content.='<input type="hidden" class="picked_tax" name="filter_search_type[]" value="'.esc_attr($use_name).'" >';
                                     }else if($adv6_taxonomy=='property_action_category'){
-                                        $tab_content.='<input type="hidden" class="picked_tax" name="filter_search_action[]" value="'.$use_name.'" >';
+                                        $tab_content.='<input type="hidden" class="picked_tax" name="filter_search_action[]" value="'.esc_attr($use_name).'" >';
                                     }else if($adv6_taxonomy=='property_city'){
-                                        $tab_content.='<input type="hidden" class="picked_tax" name="advanced_city" value="'.$use_name.'" >';
+                                        $tab_content.='<input type="hidden" class="picked_tax" name="advanced_city" value="'.esc_attr($use_name).'" >';
                                     }else if($adv6_taxonomy=='property_area'){
-                                        $tab_content.='<input type="hidden" class="picked_tax" name="advanced_area" value="'.$use_name.'" >';
+                                        $tab_content.='<input type="hidden" class="picked_tax" name="advanced_area" value="'.esc_attr($use_name).'" >';
                                     }else if($adv6_taxonomy=='property_county_state'){
-                                        $tab_content.='<input type="hidden" class="picked_tax" name="advanced_contystate" value="'.$use_name.'" >';
+                                        $tab_content.='<input type="hidden" class="picked_tax" name="advanced_contystate" value="'.esc_attr($use_name).'" >';
                                     }
                                     
                             
-                                    $tab_content.='<input type="hidden" name="adv6_search_tab" value="'.$use_name.'">
-                                    <input type="hidden" name="term_id" value="'.$term_id.'">'; 
+                                    $tab_content.='<input type="hidden" name="adv6_search_tab" value="'.esc_attr($use_name).'">
+                                    <input type="hidden" name="term_id" value="'.esc_attr($term_id).'">'; 
                                     
   
                                     if (function_exists('icl_translate') ){
@@ -104,7 +95,7 @@ $allowed_html=array();
                                    
                                     $tab_content.='
                                         <div class="col-md-6">
-                                            <input type="text" id="adv_location" class="form-control adv_locations_search" name="adv_location"  placeholder="'. __('Search State, City or Area','wpestate').'" value="">      
+                                            <input type="text" id="adv_location" class="form-control adv_locations_search" name="adv_location"  placeholder="'. esc_html__('Search State, City or Area','wpresidence').'" value="">      
                                         </div>
 
                                         <div class="col-md-6 adv2_nopadding">';
@@ -121,7 +112,7 @@ $allowed_html=array();
                                                             $tab_content.=  $full_name->name;
                                                             
                                                         }else{
-                                                            $tab_content.= __('All Types','wpestate'); 
+                                                            $tab_content.= esc_html__('Categories','wpresidence'); 
                                                         }   
                                                             
                                                         $tab_content.= '<span class="caret caret_filter"></span> </div>   
@@ -152,7 +143,7 @@ $allowed_html=array();
                                                             $full_name   =  get_term_by('slug', ( ( $_GET['filter_search_action'][0] ) ),'property_action_category');
                                                             $tab_content.=  $full_name->name;
                                                         }else{
-                                                            $tab_content.= __('All Actions','wpestate'); 
+                                                            $tab_content.= esc_html__('Types','wpresidence'); 
                                                         }
                                                            
                                                         $tab_content.='<span class="caret caret_filter"></span> </div>           
@@ -176,7 +167,7 @@ $allowed_html=array();
                                             <input type="hidden" name="is2" value="1">
 
                                             <div class="col-md-6">
-                                                <input name="submit" type="submit" class="wpresidence_button" id="advanced_submit_22" value="'.__('SEARCH PROPERTIES','wpestate').'">
+                                                <input name="submit" type="submit" class="wpresidence_button" id="advanced_submit_22" value="'.esc_html__('Search Properties','wpresidence').'">
                                             </div>
                                         </div>';
 
@@ -187,8 +178,8 @@ $allowed_html=array();
                                         ob_end_clean();
                                     }    
                                     
-                                $tab_content.='<input type="hidden" name="adv6_search_tab" value="'.$use_name.'">
-                                <input type="hidden" name="term_id" value="'.$term_id.'">';    
+                                $tab_content.='<input type="hidden" name="adv6_search_tab" value="'.esc_html($use_name).'">
+                                <input type="hidden" name="term_id" value="'.esc_html($term_id).'">';    
                                 
                                 $tab_content.='</form>        
                             </div>  ';
@@ -196,28 +187,13 @@ $allowed_html=array();
                         }
                       
                 
-                    print '<div class="nav nav-tabs" role="tablist">'.$tab_items.'</div>';    
-                    print '<div class="tab-content">'.$tab_content.'</div>';
-                    
-  
-                    
+                    print '<div class="nav nav-tabs" role="tablist">'.$tab_items.'</div>';    //escaped above
+                    print '<div class="tab-content">'.$tab_content.'</div>';//escaped above        
                     print'</div>';
-                    
-                
-                
-                    
-              
-                
-                
-                
-          
-           
             ?>
-            
-              <?php get_template_part('templates/preview_template')?>
+            <?php include( locate_template('templates/preview_template.php') ); ?>
         </div>
-       
-        
+
        <div style="clear:both;"></div>
 </div>
 
@@ -231,19 +207,20 @@ $args = array(
 
 $terms = get_terms( 'property_city', $args );
 foreach ( $terms as $term ) {
-   $availableTags.= '"'.$term->name.'",';
+   $availableTags.= '"'.esc_html($term->name).'",';
 }
 
 $terms = get_terms( 'property_area', $args );
 
 foreach ( $terms as $term ) {
-   $availableTags.= '"'.$term->name.'",';
+   $availableTags.= '"'.esc_html($term->name).'",';
 }
 
 $terms = get_terms( 'property_county_state', $args );
 foreach ( $terms as $term ) {
-   $availableTags.= '"'.$term->name.'",';
+   $availableTags.= '"'.esc_html($term->name).'",';
 }
+//$availableTags is escaped above
 
  print '<script type="text/javascript">
                        //<![CDATA[

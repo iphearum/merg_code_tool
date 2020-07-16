@@ -1,16 +1,17 @@
 <?php
-global $logo_header_align;
-if($logo_header_align=='center'){
-    $logo_header_align='left';
+global $wpestate_logo_header_align;
+if($wpestate_logo_header_align=='center'){
+    $wpestate_logo_header_align='left';
 }
-$text_header_align_select   =  get_option('wp_estate_text_header_align','');
+$text_header_align_select   =  wpresidence_get_option('wp_estate_text_header_align','');
 ?>
-<div id="header_type3_wrapper" class="header_type3_menu_sidebar <?php echo 'header_'.$logo_header_align.' header_alignment_text_'.$text_header_align_select;?>">
+<div id="header_type3_wrapper" class="header_type3_menu_sidebar <?php echo 'header_'.esc_attr($wpestate_logo_header_align).' header_alignment_text_'.esc_attr($text_header_align_select);?>">
     
-    <ul class="xoxo">
-        <?php dynamic_sidebar('sidebar-menu-widget-area-before'); ?>
-    </ul>
-    
+   <?php  if ( is_active_sidebar( 'sidebar-menu-widget-area-before' ) ) { ?>
+        <ul class="xoxo">
+            <?php dynamic_sidebar('sidebar-menu-widget-area-before'); ?>
+        </ul>
+    <?php } ?>
     
     <nav id="access">
         <?php 
@@ -22,8 +23,10 @@ $text_header_align_select   =  get_option('wp_estate_text_header_align','');
         ?>
     </nav><!-- #access -->
     
-    <ul class="xoxo">
-        <?php dynamic_sidebar('sidebar-menu-widget-area-after'); ?>
-    </ul>
     
+    <?php  if ( is_active_sidebar( 'sidebar-menu-widget-area-after' ) ) { ?>
+        <ul class="xoxo">
+            <?php dynamic_sidebar('sidebar-menu-widget-area-after'); ?>
+        </ul>
+    <?php } ?>
 </div> 

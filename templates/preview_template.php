@@ -1,10 +1,12 @@
      
 <div id="results">
     <div class="results_header">
-        <?php _e('We found ','wpestate'); ?> <span id="results_no">0</span> <?php _e('results.','wpestate'); ?>  
-        <span id="preview_view_all"><?php _e('View results');?></span>
-        <!--<span id="showinpage"> <?php //_e('Do you want to load the results now ?','wpestate');?> </span>-->
+        <?php esc_html_e('We found ','wpresidence'); ?> <span id="results_no">0</span> <?php esc_html_e('results.','wpresidence'); ?>  
+        <span id="preview_view_all"><?php esc_html_e('View results','wpresidence');?></span>
+     
     </div>
     <div id="results_wrapper">
     </div>
+    
+     <?php wp_nonce_field( 'wpestate_regular_search', 'wpestate_regular_search_nonce' ); ?>
 </div>
