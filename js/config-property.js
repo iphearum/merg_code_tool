@@ -1,5 +1,6 @@
 /*global $, jQuery, document */
 //jslint checked
+
 jQuery(document).ready(function ($) {
     "use strict";
     var new_feature, current_features, new_status, current_status, parent_div, field_type;
@@ -8,19 +9,20 @@ jQuery(document).ready(function ($) {
     new_status = null;
     current_status = null;
 
-    $('.deletefieldlink').click(function (event) {
+    $('.deletefieldlink').on( 'click', function(event) {
         event.preventDefault();
         parent_div = $(this).parent();
         parent_div.remove();
     });
 
     field_type = 'short text';
-    $('#field_type ').change(function () {
+    $('#field_type').on('change', function(){ 
         field_type = this.value;
     });
     
     
-    $('#add_curency').click(function (event) {
+    $('#add_curency').on( 'click', function(event) {
+        
         event.preventDefault();
         var newfield, field_name, field_value, field_order,field_label;
         newfield = '';
@@ -48,7 +50,8 @@ jQuery(document).ready(function ($) {
 
 
 
-    $('#add_field').click(function (event) {
+    $('#add_field').on( 'click', function(event) {
+       
         event.preventDefault();
         var newfield, field_name, field_label, field_order, drodown_values;
         newfield = '';
@@ -79,15 +82,17 @@ jQuery(document).ready(function ($) {
     
 
     $('#new_feature, #new_status').focus(function () {
+    
         $(this).val('');
     });
 
-    $('#add_feature').click(function (event) {
+    $('#add_feature').on( 'click', function(event) {  
+    
         event.preventDefault();
-        new_feature = $('#new_feature').val();
+        var  new_feature = $('#new_feature').val();
         if (new_feature !== '') {
             //feature_list
-            current_features    =   $('#feature_list').val();
+            var  current_features    =   $('#feature_list').val();
             if (current_features === '') {
                 current_features    =   new_feature;
             } else {
@@ -99,11 +104,12 @@ jQuery(document).ready(function ($) {
     });
 
 
-    $('#add_status').click(function () {
-        new_status = $('#new_status').val();
+    $('#add_status').on( 'click', function(event) {
+        
+        var new_status = $('#new_status').val();
         if (new_status !== '') {
             //status_list
-            current_features    =   $('#status_list').val();
+            var current_features    =   $('#status_list').val();
 
             if (current_status === '') {
                 current_status    =   new_status;

@@ -1,22 +1,22 @@
 <?php
 //related listings
-global $property_unit_slider;
-global $no_listins_per_row;
+global $wpestate_property_unit_slider;
+global $wpestate_no_listins_per_row;
 global $wpestate_uset_unit;
-global $custom_unit_structure;
-global $prop_unit;
+global $wpestate_custom_unit_structure;
+global $wpestate_prop_unit;
 global $post;
 
 $not_in[]               =   $exclude=  $post->ID;    
-$custom_unit_structure  =   get_option('wpestate_property_unit_structure');
-$wpestate_uset_unit     =   intval ( get_option('wpestate_uset_unit','') );
-$no_listins_per_row     =   intval( get_option('wp_estate_listings_per_row', '') );
-$property_unit_slider   =   get_option('wp_estate_prop_list_slider','');
+$wpestate_custom_unit_structure  =   wpresidence_get_option('wpestate_property_unit_structure');
+$wpestate_uset_unit     =   intval ( wpresidence_get_option('wpestate_uset_unit','') );
+$wpestate_no_listins_per_row     =   intval( wpresidence_get_option('wp_estate_listings_per_row', '') );
+$wpestate_property_unit_slider   =   wpresidence_get_option('wp_estate_prop_list_slider','');
 $counter                =   0;
 $post_category          =   get_the_terms($post->ID, 'property_category');
 $post_action_category   =   get_the_terms($post->ID, 'property_action_category');
 $post_city_category     =   get_the_terms($post->ID, 'property_city');
-$similar_no             =   3;
+$similar_no             =   wpresidence_get_option('wp_estate_similar_prop_no');
 $args                   =   '';
 $items[]                =   '';
 $items_actions[]        =   '';
@@ -86,37 +86,41 @@ $args=array(
     'relation'              => 'AND',
                                $categ_array,
                                $action_array,
-                              
+                                $city_array
                                )
 );
 
 
 
-$prop_unit          =   esc_html ( get_option('wp_estate_prop_unit','') );
-$compare_submit     =   get_compare_link();
-$my_query           =   new WP_Query($args);
+if( !empty($categ_array) || !empty($action_array)){
 
-$property_card_type         =   intval(get_option('wp_estate_unit_card_type'));
-$property_card_type_string  =   '';
-if($property_card_type==0){
-    $property_card_type_string='';
-}else{
-    $property_card_type_string='_type'.$property_card_type;
-}
+    $wpestate_prop_unit          =   esc_html ( wpresidence_get_option('wp_estate_prop_unit','') );
+    $compare_submit     =   wpestate_get_template_link('compare_listings.php');
+    $my_query           =   new WP_Query($args);
+
+    $property_card_type         =   intval(wpresidence_get_option('wp_estate_unit_card_type'));
+    $property_card_type_string  =   '';
+    if($property_card_type==0){
+        $property_card_type_string='';
+    }else{
+        $property_card_type_string='_type'.$property_card_type;
+    }
 
     if ($my_query->have_posts()) { ?>	
-   
 
-        <div class="mylistings"> 
-            <h3 class="agent_listings_title_similar" ><?php _e('Similar Listings', 'wpestate'); ?></h3>   
+        <div class="mylistings" id="property_similar_listings"> 
+            <h3 class="agent_listings_title_similar" ><?php esc_html_e('Similar Listings', 'wpresidence'); ?></h3>   
             <?php
             while ($my_query->have_posts()):$my_query->the_post();
-                get_template_part('templates/property_unit'.$property_card_type_string); 
+                   include( locate_template('templates/property_unit'.$property_card_type_string.'.php') );
             endwhile;
             ?>
         </div>	
-    <?php } //endif have post
-    ?>
+    <?php 
+        $sticky_menu_array['property_similar_listings listings']= esc_html__('Similar Listings', 'wpresidence'); 
+    } //endif have post
+}//end if empty
+?>
 
 
 <?php

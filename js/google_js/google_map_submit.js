@@ -1,121 +1,305 @@
-/*global google */
-/*global Modernizr */
-/*global InfoBox */
-/*global googlecode_home_vars*/
+/*global google, Modernizr , InfoBox,google_map_submit_vars ,mapfunctions_vars, googlecode_home_vars,jQuery*/
 var geocoder;
 var map;
 var selected_id         =   '';
-
 var gmarkers = [];
+var propertyMarker_submit='';
 
-function initialize(){
+function google_map_submit_initialize(){
     "use strict";
-    geocoder = new google.maps.Geocoder();
+  
+   if( jQuery('#googleMapsubmit').length===0 ){
+       return;
+   }
     
     var listing_lat=jQuery('#property_latitude').val();
     var listing_lon=jQuery('#property_longitude').val();
     
-    if(listing_lat===''){
-        listing_lat=google_map_submit_vars.general_latitude
+    if( jQuery('#agency_lat').length > 0){
+        listing_lat=jQuery('#agency_lat').val();
+        listing_lon=jQuery('#agency_long').val();
     }
     
-     if(listing_lon===''){
-        listing_lon= google_map_submit_vars.general_longitude
+    if( jQuery('#developer_lat').length > 0){
+        listing_lat=jQuery('#developer_lat').val();
+        listing_lon=jQuery('#developer_long').val();
     }
     
-    var mapOptions = {
-             flat:false,
-             noClear:false,
-             zoom: 17,
-             scrollwheel: false,
-             draggable: true,
-             disableDefaultUI:false,
-             center: new google.maps.LatLng( listing_lat, listing_lon),
-             mapTypeId: google.maps.MapTypeId.ROADMAP
-           };
-  
+    if(listing_lat==='' || typeof  listing_lat==='undefined'){
+        listing_lat=google_map_submit_vars.general_latitude;
+    }
     
-    if(  document.getElementById('googleMapsubmit') ){
-        map = new google.maps.Map(document.getElementById('googleMapsubmit'), mapOptions);
+     if(listing_lon===''|| typeof  listing_lon==='undefined'){
+        listing_lon= google_map_submit_vars.general_longitude;
+    }
+    
+    
+    if( parseInt( mapfunctions_vars.geolocation_type ) == 1 ){
+        geocoder = new google.maps.Geocoder();
+        var mapOptions = {
+                flat:false,
+                noClear:false,
+                zoom: 17,
+                scrollwheel: false,
+                draggable: true,
+                disableDefaultUI:false,
+                center: new google.maps.LatLng( listing_lat, listing_lon),
+                mapTypeId: google.maps.MapTypeId.ROADMAP,
+                gestureHandling: 'cooperative'
+               };
+
+
+        if(  document.getElementById('googleMapsubmit') ){
+            map = new google.maps.Map(document.getElementById('googleMapsubmit'), mapOptions);
+        }else{
+            return;
+        }
+
+        google.maps.visualRefresh = true;
+
+        var point=new google.maps.LatLng( listing_lat, listing_lon);
+
+        wpestate_placeSavedMarker(point);
+
+        if(mapfunctions_vars.map_style !==''){
+           var styles = JSON.parse ( mapfunctions_vars.map_style );
+           map.setOptions({styles: styles});
+        }
+
+        google.maps.event.addListener(map, 'click', function(event) {
+            wpestate_placeMarker(event.latLng);
+        });
     }else{
-        return;
+        
+        var mapCenter = L.latLng( listing_lat, listing_lon );
+        map =  L.map( 'googleMapsubmit',{
+            center: mapCenter, 
+            zoom:15,
+        });
+
+        var tileLayer =  wpresidence_open_stret_tile_details();
+        map.addLayer( tileLayer );
+
+        
+       map.on('click', function(e){
+    
+            map.removeLayer( propertyMarker_submit );
+            var markerCenter        =   L.latLng( e.latlng);
+            propertyMarker_submit   =   L.marker(e.latlng).addTo(map);;
+            propertyMarker_submit.bindPopup('<div class="submit_leaflet_admin">Latitude: ' + e.latlng.lat + ' Longitude: ' + e.latlng.lng+'</div>').openPopup();
+            jQuery("#property_latitude").val(e.latlng.lat) ;
+            jQuery("#property_longitude").val( e.latlng.lng);
+            jQuery("#agency_lat").val(e.latlng.lat) ;
+            jQuery("#agency_long").val( e.latlng.lng);
+            jQuery("#developer_lat").val(e.latlng.lat) ;
+            jQuery("#developer_long").val( e.latlng.lng);
+        });
+       
+        var markerCenter        =   L.latLng(mapCenter);
+        propertyMarker_submit   =   L.marker( markerCenter ).addTo(map);
+        propertyMarker_submit.bindPopup('<div class="submit_leaflet_admin">Latitude: ' + listing_lat + ' Longitude: ' + listing_lon +'</div>');
+        
+       
+        //   setTimeout(function(){       propertyMarker_submit.openPopup(); }, 600); 
     }
-    
-    google.maps.visualRefresh = true;
-    
-    var point=new google.maps.LatLng( listing_lat, listing_lon);
-    placeSavedMarker(point);
-    
-    if(mapfunctions_vars.map_style !==''){
-       var styles = JSON.parse ( mapfunctions_vars.map_style );
-       map.setOptions({styles: styles});
-    }
-    
-    google.maps.event.addListener(map, 'click', function(event) {
-        placeMarker(event.latLng);
-    });
+	
+	
 }
  
 
 
-function placeSavedMarker(location) {
- "use strict";
-  removeMarkers();
-  var marker = new google.maps.Marker({
-    position: location,
-    map: map
-  });
-   gmarkers.push(marker);
-    
-  var infowindow = new google.maps.InfoWindow({
-    content: 'Latitude: ' + location.lat() + '<br>Longitude: ' + location.lng()  
-  });
-  
+function wpestate_placeSavedMarker(location) {
+    "use strict";
+    wpestate_removeMarkers();
+    var marker = new google.maps.Marker({
+      position: location,
+      map: map
+    });
+     gmarkers.push(marker);
+
+    var infowindow = new google.maps.InfoWindow({
+      content: 'Latitude: ' + location.lat() + '<br>Longitude: ' + location.lng()  
+    });
+
    infowindow.open(map,marker);
 
 
 }
 
 
-function codeAddress() {
-  var address   = document.getElementById('property_address').value;
-  //var e = document.getElementById("property_city_submit"); 
-  //var city      = e.options[e.selectedIndex].text;
-  city=jQuery ("#property_city_submit").val();
+function wpestate_codeAddress() {
+    "use strict";
  
-  var full_addr= address+','+city;
-  
-  var state     = document.getElementById('property_county').value;
-  if(state){
-       var full_addr=full_addr +','+state;
-  }
+    var address     =   document.getElementById('property_address').value;
+    var city        =   jQuery ("#property_city_submit").val();
+    var full_addr   =   address;
+    var listing_lat,listing_long;
+    if(city!=='none'){
+        full_addr   =   full_addr+','+city;
+    }
+    var state       =   document.getElementById('property_county').value;
+    if(state){
+        full_addr=full_addr +','+state;
+    }
+
+    var country   = document.getElementById('property_country').value;
+    if(country){
+        full_addr=full_addr +','+country;
+    }
+
+
+    if(parseInt(mapfunctions_vars.geolocation_type ) == 1 ){
  
-  var country   = document.getElementById('property_country').value;
-  if(country){
-       var full_addr=full_addr +','+country;
-  }
-  
- 
-  geocoder.geocode( { 'address': full_addr}, function(results, status) {
-    if (status == google.maps.GeocoderStatus.OK) {
-        map.setCenter(results[0].geometry.location);
+        geocoder.geocode( { 'address': full_addr}, function(results, status) {
+            if (status == google.maps.GeocoderStatus.OK) {
+                    listing_lat     =   results[0].geometry.location.lat();
+                    listing_long    =   results[0].geometry.location.lng();
+                    wpresidence_submit_set_postion(listing_lat,listing_long)
+            } else {
+                alert(google_map_submit_vars.geo_fails + status);
+            }
+        });
+    }else  if( parseInt( mapfunctions_vars.geolocation_type ) == 2 ){
+            var jqxhr = jQuery.get( "https://nominatim.openstreetmap.org/search",
+                        {
+                            format: 'json',
+                            addressdetails:'1',
+                            q: full_addr//was q
+                        })
+    
+            .done(function(data) {
+                if(data==''){
+                    alert(google_map_submit_vars.geo_fails + status);
+                }else{
+                 
+                    listing_lat     =   data[0].lat;
+                    listing_long    =   data[0].lon;
+                    wpresidence_submit_set_postion(listing_lat,listing_long);
+                }
+            })
+            .fail(function(data) {
+          
+            })
+            .always(function() {
+
+            });
+    }
+}
+
+function wpresidence_submit_set_postion(listing_lat,listing_long){
+    
+    wpestate_removeMarkers();
+    
+    if( parseInt( mapfunctions_vars.geolocation_type ) == 1 ){
+        var myLatLng = new google.maps.LatLng( listing_lat, listing_long);
+        map.setCenter(myLatLng);
         var marker = new google.maps.Marker({
             map: map,
-            position: results[0].geometry.location
+            position: myLatLng
         });
-           gmarkers.push(marker);
 
+        gmarkers.push(marker);
         var infowindow = new google.maps.InfoWindow({
-            content: 'Latitude: ' + results[0].geometry.location.lat() + '<br>Longitude: ' + results[0].geometry.location.lng()  
-         });
+            content: 'Latitude: ' + listing_lat + '<br>Longitude: ' + listing_long
+        });
 
         infowindow.open(map,marker);
-        document.getElementById("property_latitude").value=results[0].geometry.location.lat();
-        document.getElementById("property_longitude").value=results[0].geometry.location.lng();
-    } else {
-        alert(google_map_submit_vars.geo_fails + status);
+        document.getElementById("property_latitude").value  =   listing_lat ;
+        document.getElementById("property_longitude").value =   listing_long;
+    }else{
+        var mapCenter = L.latLng( listing_lat, listing_long );
+        var markerCenter        =   L.latLng(mapCenter);
+          map.removeLayer( propertyMarker_submit );
+        propertyMarker_submit   =   L.marker( markerCenter ).addTo(map);
+        propertyMarker_submit.bindPopup('<div class="submit_leaflet_admin">Latitude: ' + listing_lat + ' Longitude: ' + listing_long +'</div>');
+      
+        setTimeout(function(){       propertyMarker_submit.openPopup(); }, 600);   
+        propertyMarker_submit.fire('click');
+        document.getElementById("property_latitude").value = listing_lat ;
+        document.getElementById("property_longitude").value = listing_long;
+        map.panTo(new L.LatLng(listing_lat,listing_long));
+     
     }
-  });
+}
+
+
+
+function wpestate_codeAddress_agency(agency_adress , agency_city , agency_county,agency_lat,agency_long) {
+    "use strict";
+    var address     =   jQuery(agency_adress).val();
+    var city        =   jQuery(agency_city).val();
+    var full_addr   =   address+','+city;
+    var state       =   jQuery(agency_county).val();
+     var open_street_address='';
+     
+    if(state){
+        full_addr=full_addr +','+state;
+    }
+ 
+    open_street_address=address+','+city;
+    
+    if( wp_estate_kind_of_map == 1 ){
+        
+        geocoder.geocode( { 'address': full_addr}, function(results, status) {
+            if (status == google.maps.GeocoderStatus.OK) {
+                map.setCenter(results[0].geometry.location);
+                var marker = new google.maps.Marker({
+                    map: map,
+                    position: results[0].geometry.location
+                });
+                gmarkers.push(marker);
+
+                var infowindow = new google.maps.InfoWindow({
+                    content: 'Latitude: ' + results[0].geometry.location.lat() + '<br>Longitude: ' + results[0].geometry.location.lng()  
+                });
+
+                infowindow.open(map,marker);
+                jQuery(agency_lat).val( results[0].geometry.location.lat() );
+                jQuery(agency_long).val( results[0].geometry.location.lng() );
+            } else {
+                alert(google_map_submit_vars.geo_fails + status);
+            }
+        });
+        
+    }else  if( wp_estate_kind_of_map == 2 ){
+        var jqxhr = jQuery.get( "https://nominatim.openstreetmap.org/search",
+                    {
+                        format: 'json',
+                        addressdetails:'1',
+                        q: open_street_address//was q
+                    })
+
+        .done(function(data) {
+
+
+            if( typeof(data[0]) !='undefined' ){
+                var listing_lat     =   data[0].lat;
+                var listing_long    =   data[0].lon;
+
+                var mapCenter               =   L.latLng( listing_lat, listing_long );
+                var markerCenter            =   L.latLng(mapCenter);
+                
+                map.removeLayer( propertyMarker_submit );
+                propertyMarker_submit   =   L.marker( markerCenter ).addTo(map);
+                propertyMarker_submit.bindPopup('<div class="submit_leaflet_admin">Latitude: ' + listing_lat + ' Longitude: ' + listing_long +'</div>');
+      
+                setTimeout(function(){  propertyMarker_submit.openPopup(); }, 600);   
+        
+                map.panTo(new L.LatLng(listing_lat,listing_long));
+                jQuery(agency_lat).val(  data[0].lat );
+                jQuery(agency_long).val( data[0].lon );
+        
+            }else{
+                alert(google_map_submit_vars.geo_fails  + status);
+            }
+        })
+        .fail(function() {
+
+        })
+        .always(function() {
+
+        });
+    }
 }
 
 
@@ -129,13 +313,9 @@ function codeAddress() {
 
 
 
-
-
-
-
-function placeMarker(location) {
+function wpestate_placeMarker(location) {
     "use strict";
-    removeMarkers();
+    wpestate_removeMarkers();
     var marker = new google.maps.Marker({
        position: location,
        map: map
@@ -145,10 +325,28 @@ function placeMarker(location) {
     var infowindow = new google.maps.InfoWindow({
         content: 'Latitude: ' + location.lat() + '<br>Longitude: ' + location.lng()  
     });
-
+    
+    var myElem ;
     infowindow.open(map,marker);
-    document.getElementById("property_latitude").value=location.lat();
-    document.getElementById("property_longitude").value=location.lng();
+    myElem = document.getElementById('property_latitude');
+    if (myElem !== null) {
+        document.getElementById("property_latitude").value=location.lat();
+        document.getElementById("property_longitude").value=location.lng();
+    }
+    
+    myElem = document.getElementById('agency_lat');
+    if (myElem !== null) {
+        document.getElementById("agency_lat").value=location.lat();
+        document.getElementById("agency_long").value=location.lng();
+        
+    }
+    
+    myElem = document.getElementById('developer_lat');
+    if (myElem !== null) {
+
+        document.getElementById("developer_lat").value=location.lat();
+        document.getElementById("developer_long").value=location.lng();
+    }
 }
 
 
@@ -156,38 +354,61 @@ function placeMarker(location) {
  /// set markers function
  //////////////////////////////////////////////////////////////////////
  
-function removeMarkers(){
-    for (i = 0; i<gmarkers.length; i++){
-        gmarkers[i].setMap(null);
+function wpestate_removeMarkers(){
+    "use strict";
+
+    for (var i = 0; i<gmarkers.length; i++){
+        if( parseInt( mapfunctions_vars.geolocation_type ) == 1 ){
+            gmarkers[i].setMap(null);
+        }else{
+         map.removeLayer(gmarkers[i]);
+        }
     }
 }
-
-function setMarkers(map, locations) {
- 
-}// end setMarkers
-
                          
-jQuery('#open_google_submit').click(function(){
-     
-        setTimeout(function(){
-                 initialize();
-                google.maps.event.trigger(map, "resize");
-        },300)
+jQuery('#open_google_submit').on( 'click', function() {
+    "use strict";
+    setTimeout(function(){
+        initialize();
+        google.maps.event.trigger(map, "resize");
+    },300);
    
-  });
+});
                
     
-jQuery('#google_capture').click(function(event){
+jQuery('#google_capture').on( 'click', function(event) {
+    "use strict";
     event.preventDefault();
-    removeMarkers();
-    codeAddress();  
+    wpestate_removeMarkers();
+    wpestate_codeAddress();  
 });  
+
+if (typeof google === 'object' && typeof google.maps === 'object') {
+   google.maps.event.addDomListener(window, 'load', google_map_submit_initialize);
+}else{
+    google_map_submit_initialize();
+}
     
-google.maps.event.addDomListener(window, 'load', initialize);
 
 
 
+jQuery('#google_agency_location').on( 'click', function(event) {
+    "use strict";
+    event.preventDefault();
+    wpestate_removeMarkers();
+    wpestate_codeAddress_agency('#agency_address', '#agency_city','#agency_county','#agency_lat','#agency_long');
+});  
 
+
+jQuery('#google_developer_location').on( 'click', function(event) {
+    "use strict";
+    event.preventDefault();
+    wpestate_removeMarkers();
+    wpestate_codeAddress_agency('#developer_address', '#developer_city','#developer_county','#developer_lat','#developer_long');
+});  
+
+
+   
 
 
 jQuery(document).ready(function ($) {
@@ -218,7 +439,7 @@ jQuery(document).ready(function ($) {
     var autocomplete,autocomplete2;
     var options = {
         types: ['(cities)'],
-        componentRestrictions: {country: 'uk'}
+     //   componentRestrictions: {country: 'uk'}
     };
 
 
@@ -240,52 +461,118 @@ jQuery(document).ready(function ($) {
 
 
     if ( google_map_submit_vars.enable_auto ==='yes' ){
+        
         if(  document.getElementById('property_address') ){
-            autocomplete = new google.maps.places.Autocomplete(
-              /** @type {HTMLInputElement} */(document.getElementById('property_address')),
-                {   types: ['geocode'],
-                    "partial_match" : true
-                }
-            );
-
-        
-        
-            var input = document.getElementById('property_address');
-                google.maps.event.addDomListener(input, 'keydown', function(e) { 
-                    if (e.keyCode == 13) { 
-                        e.stopPropagation(); 
-                        e.preventDefault();
+            if( parseInt( mapfunctions_vars.geolocation_type ) == 1 ){
+                autocomplete = new google.maps.places.Autocomplete(
+                  /** @type {HTMLInputElement} */(document.getElementById('property_address')),
+                    {   types: ['geocode'],
+                        "partial_match" : true
                     }
-            }); 
-        
+                );
 
-            google.maps.event.addListener(autocomplete, 'place_changed', function(event) {
-                var place = autocomplete.getPlace();
+                var input = document.getElementById('property_address');
+                    google.maps.event.addDomListener(input, 'keydown', function(e) { 
+                        if (e.keyCode == 13) { 
+                            e.stopPropagation(); 
+                            e.preventDefault();
+                        }
+                }); 
 
-                fillInAddress(place);
-            });
-       
-        
-            autocomplete2 = new google.maps.places.Autocomplete(
-                /** @type {HTMLInputElement} */(document.getElementById('property_city_submit')),
-                {    types: ['(cities)']        }
-            );
+                google.maps.event.addListener(autocomplete, 'place_changed', function(event) {
+                    var place = autocomplete.getPlace();
+                    wpestate_fillInAddress(place);
+                });
 
-            google.maps.event.addListener(autocomplete2, 'place_changed', function() {
-                var place = autocomplete2.getPlace();
-                fillInAddress(place);
-            });
+                autocomplete2 = new google.maps.places.Autocomplete(
+                    /** @type {HTMLInputElement} */(document.getElementById('property_city_submit')),
+                    {    types: ['(cities)']        }
+                );
+
+                google.maps.event.addListener(autocomplete2, 'place_changed', function() {
+                    var place = autocomplete2.getPlace();
+                    wpestate_fillInAddress(place);
+                });
+            } else if( parseInt( mapfunctions_vars.geolocation_type ) == 2 ){
+            
+                            jQuery('#property_address').autocomplete( {
+				source: function ( request, response ) {
+					jQuery.get( 'https://nominatim.openstreetmap.org/search', {
+						format: 'json',
+						q: request.term,//was q
+						addressdetails:'1',
+					}, function( result ) {
+						if ( !result.length ) {
+                                                    response( [ {
+                                                        value: '',
+                                                        label: 'there are no results'
+                                                    } ] );
+                                                    return;
+						}
+						response( result.map( function ( place ) {
+						
+                                                       var return_obj= {
+								label: place.display_name,
+                                                                latitude: place.lat,
+								longitude: place.lon,
+								value: place.display_name,
+                                                            
+                                                        };
+                                                        
+                               
+                                                        if(typeof(place.address)!='undefined'){
+                                                            return_obj.county=place.address.county;
+                                                        }
+                                                        
+                                                        if(typeof(place.address)!='undefined'){
+                                                            return_obj.city=place.address.city;
+                                                        }
+                                                        
+                                                        if(typeof(place.address)!='undefined'){
+                                                            return_obj.state=place.address.state;
+                                                        }
+                                                        
+                                                        if(typeof(place.address)!='undefined'){
+                                                            return_obj.country=place.address.country;
+                                                        }
+                                                        
+                                                        if(typeof(place.address)!='undefined'){
+                                                            return_obj.zip=place.address.postcode;
+                                                        }
+                                                        
+                                                        return return_obj
+                                                        
+//                                                       
+						} ) );
+					}, 'json' );
+				},
+				select: function ( event, ui ) {
+                                 
+					var listing_lat     =   ui.item.latitude;
+                                        var listing_long    =   ui.item.longitude;
+                                
+                                     
+                                        $('#property_zip').val( ui.item.zip );
+                                        $('#property_county').val( ui.item.county);
+                                        $('#property_city_submit').val( ui.item.city);
+                                        $('#property_country').val( ui.item.country);
+                                        $('#property_city_submit').val( ui.item.city);
+                                            
+                                        wpresidence_submit_set_postion(listing_lat,listing_long);
+				}
+			} );
+            
+            }
+            
+            
+            
+            
         }
     }
     
     
-    
-    
-    
-    
-    
-    function fillInAddress(place) {
-    
+    function wpestate_fillInAddress(place) {
+       
         $('#property_area').val('');
         $('#property_zip').val('');
         $('#property_county').val('');
@@ -323,37 +610,31 @@ jQuery(document).ready(function ($) {
             
           
         }
-        
+        wpestate_codeAddress();
     }
-    
-    
-  
-   
-    jQuery('#google_capture2').click(function(event){
-        event.preventDefault();
-        codeAddress_child();  
-    });  
-    
-    
 
-    function codeAddress_child() {
-        var address   = document.getElementById('property_address').value;
-        //var e = document.getElementById("property_city_submit"); 
-        //var city      = e.options[e.selectedIndex].text;
-        var city=jQuery("#property_city_submit").val();
+    jQuery('#google_capture2').on( 'click', function(event) {
+        event.preventDefault();
+        wpestate_codeAddress_child();  
+    });  
+
+    function wpestate_codeAddress_child() {
+       
+        var address =   document.getElementById('property_address').value;
+        var city    =   jQuery("#property_city_submit").val();
 
         var full_addr= address+','+city;
         if(  document.getElementById('property_state') ){
             var state     = document.getElementById('property_state').value;
             if(state){
-                 var full_addr=full_addr +','+state;
+                full_addr=full_addr +','+state;
             }
         }
 
         if(  document.getElementById('property_country') ){
             var country   = document.getElementById('property_country').value;
             if(country){
-                 var full_addr=full_addr +','+country;
+                full_addr=full_addr +','+country;
             }
         }   
 
@@ -379,7 +660,4 @@ jQuery(document).ready(function ($) {
         });
     }
     
-    
-    /////////////////////////////////////// search code
- 
 });

@@ -21,9 +21,9 @@ if (esc_html( get_post_meta($post->ID, 'group_pictures', true) ) != 'no') {
     $video_id           = esc_html( get_post_meta($post->ID, 'embed_video_id', true) );
     $video_type         = esc_html( get_post_meta($post->ID, 'embed_video_type', true) );
 
-        if ($post_attachments || has_post_thumbnail() || get_post_meta($post->ID, 'embed_video_id', true)) {  ?>   
+        if ($post_attachments || has_post_thumbnail() || get_post_meta($post->ID, 'embed_video_id', true)) {   ?>   
 
-            <div id="carousel-example-generic" class="owl-carousel carousel slide post-carusel" data-ride="carousel" data-interval="false">
+            <div id="carousel-example-generic" class="carousel slide post-carusel" data-ride="carousel" data-interval="false">
               <!-- Indicators -->
               <ol class="carousel-indicators">
                  <?php  
@@ -38,7 +38,7 @@ if (esc_html( get_post_meta($post->ID, 'group_pictures', true) ) != 'no') {
                  }
                  
                 
-                 foreach ($post_attachments as $attachment) {
+                foreach ($post_attachments as $attachment) {
                     //$preview = wp_get_attachment_image_src($attachment->ID, 'blog_thumb');
                     $counter++;
                     $active='';
@@ -48,14 +48,12 @@ if (esc_html( get_post_meta($post->ID, 'group_pictures', true) ) != 'no') {
                          $active=" ";
                     }
                  ?>
+                 <li data-target="#carousel-example-generic" data-slide-to="<?php print intval($counter-1);?>" class="<?php esc_attr($active);?>"></li>   
                  
-                  <li data-target="#carousel-example-generic" data-slide-to="<?php print $counter-1;?>" class="<?php $active;?>"></li>   
-                 
-                 <?php
-                 }
-                 ?>
-                
-            
+                <?php
+                }
+                ?>
+
               </ol>
 
               <!-- Wrapper for slides -->
@@ -64,20 +62,20 @@ if (esc_html( get_post_meta($post->ID, 'group_pictures', true) ) != 'no') {
                  if($video_id!=''){
                  ?>
                  <div class="item active">
-                     <?php
-                     if($video_type=='vimeo'){
-                        print custom_vimdeo_video($video_id);
-                     }else{
-                        print custom_youtube_video($video_id);
-                     }
-                      ?>
+                    <?php
+                    if($video_type=='vimeo'){
+                       print wpestate_custom_vimdeo_video($video_id);
+                    }else{
+                       print wpestate_custom_youtube_video($video_id);
+                    }
+                    ?>
                   </div>
                  <?php
                  }
                  
                  $counter=0;
                  foreach ($post_attachments as $attachment) {
-                    //$preview = wp_get_attachment_image_src($attachment->ID, 'blog_thumb');
+                   
                     $counter++;
                     $active='';
                     if($counter==1 && $has_video!=1){
@@ -90,12 +88,12 @@ if (esc_html( get_post_meta($post->ID, 'group_pictures', true) ) != 'no') {
                     $attachment_meta = wp_get_attachment($attachment->ID)
                     ?>
                  
-                 <div class="item <?php print $active;?>">
-                        <a href="<?php print $full_prty[0]; ?>" rel="prettyPhoto" title="<?php print $attachment_meta['caption']; ?>"   class="prettygalery" > 
-                            <img  src="<?php print $full_img[0];?>" alt="<?php print $attachment_meta['alt']; ?>" class="img-responsive lightbox_trigger" />
+                 <div class="item <?php print esc_attr($active);?>">
+                        <a href="<?php print esc_url($full_prty[0]); ?>" rel="prettyPhoto" title="<?php print esc_attr($attachment_meta['caption']); ?>"   class="prettygalery" > 
+                            <img  src="<?php print esc_url($full_img[0]);?>" alt="<?php print esc_attr($attachment_meta['alt']); ?>" class="img-responsive lightbox_trigger" />
                         </a>
                         <div class="carousel-caption">
-                         <?php print $attachment_meta['caption'];?>
+                         <?php print esc_html($attachment_meta['caption']);?>
                         </div>
                   </div>
                  
@@ -119,14 +117,5 @@ if (esc_html( get_post_meta($post->ID, 'group_pictures', true) ) != 'no') {
         ?>               
 <?php
 } //end grup pictures
-
-
-
-
-
-
-
-
-
 
 ?>

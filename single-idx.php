@@ -2,15 +2,18 @@
 // Template Name: Idx Page
 // Wp Estate Pack
 
-
+if(!function_exists('wpestate_residence_functionality')){
+    esc_html_e('This page will not work without WpResidence Core Plugin, Please activate it from the plugins menu!','wpresidence');
+    exit();
+}
 
  
 get_header();
-$options=wpestate_page_details($post->ID);
+$wpestate_options=wpestate_page_details($post->ID);
 ?>
 <div class="row">
     <?php get_template_part('templates/breadcrumbs'); ?>
-    <div class=" <?php print esc_html($options['content_class']);?> ">
+    <div class=" <?php print esc_html($wpestate_options['content_class']);?> ">
         <?php get_template_part('templates/ajax_container'); ?>
         <?php 
         while ( have_posts() ) : the_post();
@@ -22,9 +25,9 @@ $options=wpestate_page_details($post->ID);
         ?>
             
         <div class="meta-info"> 
-            <?php _e('Posted by ', 'wpestate'); print ' '.get_the_author().' ';_e('on', 'wpestate'); print' '.the_date('', '', '', FALSE); ?>
-            <?php print ' | <i class="fa fa-file-o"></i> '; the_category(', ')?>
-            <?php print ' | <i class="fa fa-comment-o"></i> '; comments_number( '0', '1' );  ?>      
+            <?php esc_html_e('Posted by ', 'wpresidence'); print ' '.get_the_author().' ';esc_html_e('on', 'wpresidence'); print' '.the_date('', '', '', FALSE); ?>
+            <?php print ' | <i class="far fa-file"></i> '; the_category(', ')?>
+            <?php print ' | <i class="far fa-comment"></i> '; comments_number( '0', '1' );  ?>      
         </div> 
 
 
@@ -32,16 +35,16 @@ $options=wpestate_page_details($post->ID);
             <?php 
             global $more;
             $more=0;
-            get_template_part('templates/postslider');   
+            include( locate_template('templates/postslider.php') );   
             the_content('Continue Reading');                     
             $args = array(
-                       'before'           => '<p>' . __('Pages:','wpestate'),
+                       'before'           => '<p>' . esc_html__('Pages:','wpresidence'),
                        'after'            => '</p>',
                        'link_before'      => '',
                        'link_after'       => '',
                        'next_or_number'   => 'number',
-                       'nextpagelink'     => __('Next page','wpestate'),
-                       'previouspagelink' => __('Previous page','wpestate'),
+                       'nextpagelink'     => esc_html__('Next page','wpresidence'),
+                       'previouspagelink' => esc_html__('Previous page','wpresidence'),
                        'pagelink'         => '%',
                        'echo'             => 1
               ); 
@@ -50,7 +53,7 @@ $options=wpestate_page_details($post->ID);
         </div>    
          
         <!-- #related posts start-->    
-        <?php  get_template_part('templates/related_posts');?>    
+        <?php  include( locate_template('templates/related_posts.php') );?>    
         <!-- #end related posts -->   
         
         <!-- #comments start-->
@@ -60,7 +63,7 @@ $options=wpestate_page_details($post->ID);
         <?php endwhile; // end of the loop. ?>
     </div>
        
-<?php  include(locate_template('sidebar.php')); ?>
+<?php   include get_theme_file_path('sidebar.php'); ?>
 </div>   
 <div class="hidden-idx">
     <?php

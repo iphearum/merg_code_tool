@@ -1,36 +1,35 @@
 <?php
 // Template Name: User Dashboard Favorite
 // Wp Estate Pack
-global $no_listins_per_row;
-global $wpestate_uset_unit;
-global $custom_unit_structure;
-        
-$custom_unit_structure    =   get_option('wpestate_property_unit_structure');
-$wpestate_uset_unit       =   intval ( get_option('wpestate_uset_unit','') );
-$no_listins_per_row       =   4;
+wpestate_dashboard_header_permissions();
 
-if ( !is_user_logged_in() ) {   
-    wp_redirect(  home_url() );exit;
-} 
+global $wpestate_no_listins_per_row;
+global $wpestate_uset_unit;
+global $wpestate_custom_unit_structure;
+        
+$wpestate_custom_unit_structure    =   wpresidence_get_option('wpestate_property_unit_structure');
+$wpestate_uset_unit       =   intval ( wpresidence_get_option('wpestate_uset_unit','') );
+$wpestate_no_listins_per_row       =   4;
+
+
 
 $current_user = wp_get_current_user();  
-$paid_submission_status         =   esc_html ( get_option('wp_estate_paid_submission','') );
-$price_submission               =   floatval( get_option('wp_estate_price_submission','') );
-$submission_curency_status      =   esc_html( get_option('wp_estate_submission_curency','') );
+$paid_submission_status         =   esc_html ( wpresidence_get_option('wp_estate_paid_submission','') );
+$price_submission               =   floatval( wpresidence_get_option('wp_estate_price_submission','') );
+$submission_curency_status      =   esc_html( wpresidence_get_option('wp_estate_submission_curency','') );
 $userID                         =   $current_user->ID;
 $user_option                    =   'favorites'.$userID;
 $curent_fav                     =   get_option($user_option);
 $show_remove_fav                =   1;   
 $show_compare                   =   1;
 $show_compare_only              =   'no';
-$currency                       =   esc_html( get_option('wp_estate_currency_symbol', '') );
-$where_currency                 =   esc_html( get_option('wp_estate_where_currency_symbol', '') );
+$wpestate_currency                       =   esc_html( wpresidence_get_option('wp_estate_currency_symbol', '') );
+$where_currency                 =   esc_html( wpresidence_get_option('wp_estate_where_currency_symbol', '') );
 
 get_header();
-$options=wpestate_page_details($post->ID);
+$wpestate_options=wpestate_page_details($post->ID);
 
-
-$property_card_type         =   intval(get_option('wp_estate_unit_card_type'));
+$property_card_type         =   intval(wpresidence_get_option('wp_estate_unit_card_type'));
 $property_card_type_string  =   '';
 if($property_card_type==0){
     $property_card_type_string='';
@@ -39,34 +38,10 @@ if($property_card_type==0){
 }
 
 ?> 
-<?php
-$current_user               =   wp_get_current_user();
-$user_custom_picture        =   get_the_author_meta( 'small_custom_picture' , $current_user->ID  );
-$user_small_picture_id      =   get_the_author_meta( 'small_custom_picture' , $current_user->ID  );
-if( $user_small_picture_id == '' ){
-
-    $user_small_picture[0]=get_template_directory_uri().'/img/default-user_1.png';
-}else{
-    $user_small_picture=wp_get_attachment_image_src($user_small_picture_id,'agent_picture_thumb');
-    
-}
-?>
-
-
 
 
 <div class="row row_user_dashboard">
-
-   <div class="col-md-3 user_menu_wrapper">
-       <div class="dashboard_menu_user_image"  style="margin-bottom:60px">
-            <div class="menu_user_picture" style="background-image: url('<?php print $user_small_picture[0];  ?>');height: 80px;width: 80px;" ></div>
-            <div class="dashboard_username">
-                <?php _e('Welcome back, ','wpestate'); echo $user_login.'!';?>
-                <p style="color:white;font-weight: bold">[<?php  echo welcome_user_roles(); ?>]</p>
-            </div> 
-        </div>
-          <?php  get_template_part('templates/user_menu');  ?>
-    </div>
+    <?php  get_template_part('templates/dashboard-left-col');  ?>
     
     <div class="col-md-9 dashboard-margin">
         <?php   get_template_part('templates/breadcrumbs'); ?>
@@ -89,33 +64,24 @@ if( $user_small_picture_id == '' ){
 
              $prop_selection = new WP_Query($args);
              $counter = 0;
-             $options['related_no']=4;
+             $wpestate_options['related_no']=4;
              print '<div id="listing_ajax_container">';
              print'<div class="col-md-12 user_profile_div"> ';
              while ($prop_selection->have_posts()): $prop_selection->the_post(); 
       
-                    get_template_part('templates/property_unit'.$property_card_type_string);
+                    include( locate_template('templates/property_unit'.$property_card_type_string.'.php' ) );
          
              endwhile;
              print '</div>';
              print '</div>';
         }else{
             print'<div class="col-md-12 row_dasboard-prop-listing">';
-            print '<h4>'.__('You don\'t have any favorite properties yet!','wpestate').'</h4>';
+            print '<h4>'.esc_html__('You don\'t have any favorite properties yet!','wpresidence').'</h4>';
             print'</div>';
         }
 
-
-
-      
         ?>    
-       
-                
-                
+           
     </div>
-    
- 
-  
 </div>   
-
 <?php get_footer(); ?>

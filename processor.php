@@ -1,27 +1,30 @@
 <?php
 // Template Name: Paypal Processor
 // Wp Estate Pack
-
+if(!function_exists('wpestate_residence_functionality')){
+    esc_html_e('This page will not work without WpResidence Core Plugin, Please activate it from the plugins menu!','wpresidence');
+    exit();
+}
  
     
- $paid_submission_status    = esc_html ( get_option('wp_estate_paid_submission','') );
+ $paid_submission_status    = esc_html ( wpresidence_get_option('wp_estate_paid_submission','') );
  if($paid_submission_status !='per listing'){
    // exit();
  }
 
-$paypal_status  =   esc_html( get_option('wp_estate_paypal_api','') );
+$paypal_status  =   esc_html( wpresidence_get_option('wp_estate_paypal_api','') );
 $host           =   'https://api.sandbox.paypal.com';
 if($paypal_status == 'live'){
     $host='https://api.paypal.com';
 }
 
-$current_user = wp_get_current_user();     
-$processor_link                 =   get_procesor_link();
-$clientId                       =   esc_html( get_option('wp_estate_paypal_client_id','') );
-$clientSecret                   =   esc_html( get_option('wp_estate_paypal_client_secret','') );
-$price_submission               =   floatval( get_option('wp_estate_price_submission','') );
+$current_user                   =   wp_get_current_user();     
+$processor_link                 =   wpestate_get_template_link('processor.php');
+$clientId                       =   esc_html( wpresidence_get_option('wp_estate_paypal_client_id','') );
+$clientSecret                   =   esc_html( wpresidence_get_option('wp_estate_paypal_client_secret','') );
+$price_submission               =   floatval( wpresidence_get_option('wp_estate_price_submission','') );
 $price_submission               =   number_format($price_submission, 2, '.', '');
-$submission_curency_status      =   esc_html( get_option('wp_estate_submission_curency','') );
+$submission_curency_status      =   esc_html( wpresidence_get_option('wp_estate_submission_curency','') );
 $headers                        =   'From: My Name <myname@example.com>' . "\r\n";
 $attachments                    =   '';
 $allowed_html   =   array();
@@ -32,7 +35,7 @@ if (isset($_GET['token']) && isset($_GET['PayerID']) ){
         $payerId   =    esc_html    ( wp_kses($_GET['PayerID'], $allowed_html) );
 
         // get transfer data
-        $save_data=get_option('paypal_transfer');
+        $save_data              =   get_option('paypal_transfer');
         $payment_execute_url    =   $save_data[$current_user->ID ]['paypal_execute'];
         $token                  =   $save_data[$current_user->ID ]['paypal_token'];
         $listing_id             =   $save_data[$current_user->ID ]['listing_id'];
@@ -63,8 +66,8 @@ if (isset($_GET['token']) && isset($_GET['PayerID']) ){
                 update_post_meta($listing_id, 'pay_status', 'paid');
                 
                 // if admin does not need to approve - make post status as publish
-                $admin_submission_status = esc_html ( get_option('wp_estate_admin_submission','') );
-                $paid_submission_status  = esc_html ( get_option('wp_estate_paid_submission','') );
+                $admin_submission_status = esc_html ( wpresidence_get_option('wp_estate_admin_submission','') );
+                $paid_submission_status  = esc_html ( wpresidence_get_option('wp_estate_paid_submission','') );
               
                 if($admin_submission_status=='no'  && $paid_submission_status=='per listing' ){
                       
@@ -91,8 +94,8 @@ if (isset($_GET['token']) && isset($_GET['PayerID']) ){
          }
        
        
-        $redirect = get_dashboard_link();
-      wp_redirect($redirect);exit;
+        $redirect = wpestate_get_template_link('user_dashboard.php');
+        wp_redirect($redirect);exit;
    
 }
 $token = '';
@@ -105,17 +108,19 @@ $token = '';
 /// Process messages from Paypal IPN
 //////////////////////////////////////////////////////////////////////////////////////
 define('DEBUG',0);
+ob_start();
+global $wp_filesystem;
+if (empty($wp_filesystem)) {
+    require_once (ABSPATH . '/wp-admin/includes/file.php');
+    WP_Filesystem();
+}
+            
+
+$raw_post_data =  $wp_filesystem->get_contents('php://input');
 
 
-$headers = 'From: noreply  <noreply@'.$_SERVER['HTTP_HOST'].'>' . "\r\n".
-                        'Reply-To: noreply@'.$_SERVER['HTTP_HOST']. "\r\n" .
-                        'X-Mailer: PHP/' . phpversion();
-
-
-      
-$raw_post_data = file_get_contents('php://input');
 $raw_post_array = explode('&', $raw_post_data);
-$myPost = array();
+$myPost         = array();
 
 foreach ($raw_post_array as $keyval) {
         $keyval = explode ('=', $keyval);
@@ -129,83 +134,54 @@ if(function_exists('get_magic_quotes_gpc')) {
 } 
 
 foreach ($myPost as $key => $value) {        
-   if($get_magic_quotes_exists == true && get_magic_quotes_gpc() == 1) { 
+    if($get_magic_quotes_exists == true && get_magic_quotes_gpc() == 1) { 
         $value = urlencode(stripslashes($value)); 
-   } else {
+    } else {
         $value = urlencode($value);
-   }
-   $req .= "&$key=$value";
+    }
+    $req .= "&$key=$value";
 }
  
 
 // Step 2: POST IPN data back to PayPal to validate
-$paypal_status  =   esc_html( get_option('wp_estate_paypal_api','') );
+$paypal_status  =   esc_html( wpresidence_get_option('wp_estate_paypal_api','') );
 if($paypal_status == 'live'){
-     $paypal_url = "https://www.paypal.com/cgi-bin/webscr";
+    $paypal_url = "https://www.paypal.com/cgi-bin/webscr";
 } else {
-     $paypal_url = "https://www.sandbox.paypal.com/cgi-bin/webscr";
+    $paypal_url = "https://www.sandbox.paypal.com/cgi-bin/webscr";
 }  
-   
+ 
+$args=array(
+        'method' => 'POST',
+        'timeout' => 45,
+        'redirection' => 5,
+        'httpversion' => '1.0',
+        'sslverify' => false,
+        'blocking' => true,
+        'body' =>  $req,
 
-   
-$ch = curl_init($paypal_url);
-if ($ch == FALSE) {
-        return FALSE;
-}
-
-curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
-curl_setopt($ch, CURLOPT_POST, 1);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
-curl_setopt($ch, CURLOPT_POSTFIELDS, $req);
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 1);
-curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
-curl_setopt($ch, CURLOPT_FORBID_REUSE, 1);
-
-if(DEBUG == true) {
-        curl_setopt($ch, CURLOPT_HEADER, 1);
-        curl_setopt($ch, CURLINFO_HEADER_OUT, 1);
-}
+);
+     
+$response   =   wp_remote_post( $paypal_url, $args ); 
+$res        =   '';
 
 
-
-// Set TCP timeout to 30 seconds
-curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 30);
-curl_setopt($ch, CURLOPT_HTTPHEADER, array('Connection: Close'));
-
-
-
-$res = curl_exec($ch);
-
-if (curl_errno($ch) != 0) // cURL error
-        {
-        if(DEBUG == true) {        
-               // error_log(date('[Y-m-d H:i e] '). "Can't connect to PayPal to validate IPN message: " . curl_error($ch) . PHP_EOL, 3, LOG_FILE);
-        }
-        curl_close($ch);
-        exit;
-
+if ( is_wp_error( $response ) ) {
+    $error_message = $response->get_error_message();
+    die($error_message);
 } else {
-        // Log the entire HTTP response if debug is switched on.
-        if(DEBUG == true) {
-                // Split response headers and payload
-                list($headers, $res) = explode("\r\n\r\n", $res, 2);
-        }
-        curl_close($ch);
-       
-}
+    $res = wp_remote_retrieve_body( $response );
+ }       
 
 
-
-// Inspect IPN validation result and act accordingly
-//$res= "VERIFIED";
 
 if (strcmp ($res, "VERIFIED") == 0) {
- 
+
         $allowed_html   =   array();
         $payment_status         =   wp_kses ( esc_html( $_POST['payment_status'] ),$allowed_html );
         $txn_id                 =   wp_kses ( esc_html ($_POST['txn_id']),$allowed_html );
         $txn_type               =   wp_kses ( esc_html($_POST['txn_type']),$allowed_html );   
-        $paypal_rec_email       =   esc_html( get_option('wp_estate_paypal_rec_email','') );
+        $paypal_rec_email       =   esc_html( wpresidence_get_option('wp_estate_paypal_rec_email','') );
         $receiver_email         =   wp_kses ( esc_html($_POST['receiver_email']),$allowed_html );
         $payer_id               =   wp_kses ( esc_html($_POST['payer_id']),$allowed_html );
   
@@ -213,45 +189,23 @@ if (strcmp ($res, "VERIFIED") == 0) {
         $amount                 =   wp_kses ( esc_html($_POST['amount']),$allowed_html );
         $recurring_payment_id   =   wp_kses ( esc_html($_POST['recurring_payment_id']),$allowed_html );
         
-        $user_id                =   retrive_user_by_profile($recurring_payment_id) ; 
-      
-        
+        //$user_id                =   retrive_user_by_profile($recurring_payment_id) ; 
+        $user_id                =   wpestate_retrive_user_by_recurring_payment_id($recurring_payment_id);     
         $pack_id                =   get_user_meta($user_id, 'package_id',true);
         $price                  =   get_post_meta($pack_id, 'pack_price', true);
-        
-        
-        $mailm='';
-        foreach ($_POST as $key => $value){
-            $key    =   sanitize_key($key);
-            $value  =   wp_kses(esc_html($value),$allowed_html);
-            $mailm.='['.$key.']='.$value.'</br>';
-        }  
-      
-        
+
         if( $payment_status=='Completed' ){
-        
-            
-            if($receiver_email!=$paypal_rec_email){
-       
-                exit();
-            }
-               
-          
-            
+
             if(retrive_invoice_by_taxid($txn_id)){// payment already processd
-             
                 exit();
             }
-        
-            
+
             if( $user_id==0 ){ // no user with such profile id
-              
-                 exit();
+                exit();
             }
            
             if( $amount != $price){ // received payment diffrent than pack value
-            
-                 exit(); 
+                exit(); 
             }
             
             wpestate_upgrade_user_membership($user_id,$pack_id,2,$txn_id);
@@ -260,20 +214,18 @@ if (strcmp ($res, "VERIFIED") == 0) {
                 'merchant'              => 'Paypal'
             );
             wpestate_select_email_type($receiver_email,'recurring_payment',$arguments);
-           
          
         }else{ // payment not completed
            
             if($txn_type!='recurring_payment_profile_created'){
-                wpestate_downgrade_to_free($user_id);
+             //   wpestate_downgrade_to_free($user_id);
             }
         }
  
 } else if (strcmp ($res, "INVALID") == 0) {
-    exit('invalid');    
+  exit('invalid exit');    
 }
  
-
 
 /////////////////////////////////////////////////////////////////////////////////////
 // get user by paypal recurring profile
@@ -288,7 +240,7 @@ function retrive_user_by_profile($recurring_payment_id){
             'meta_value'   => $recurring_payment_id,
             'meta_compare' => '='
             );
-        //print_r($arg);
+     
         $userid=0;
         $blogusers = get_users($arg);
         foreach ($blogusers as $user) {
@@ -329,6 +281,23 @@ function retrive_invoice_by_taxid($tax_id){
         return false;
     }
 
+}
+
+
+
+function wpestate_retrive_user_by_recurring_payment_id($recurring_payment_id){   
+    $arg=array(
+        'meta_key'     => 'paypal_agreement',
+	'meta_value'   => trim($recurring_payment_id),
+        'meta_compare' => '=',
+    );
+    $userid=0;
+    $blogusers = get_users($arg);
+    
+    foreach ($blogusers as $user) {
+       $userid=$user->ID;
+    }
+    return $userid;
 }
 
 

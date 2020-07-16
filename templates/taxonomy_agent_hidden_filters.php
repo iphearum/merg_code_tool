@@ -3,7 +3,7 @@ global $current_adv_filter_search_label;
 global $current_adv_filter_category_label;
 global $current_adv_filter_city_label;
 global $current_adv_filter_area_label;
-global $prop_unit;
+global $wpestate_prop_unit;
 
 $current_name      =   '';
 $current_slug      =   '';
@@ -11,18 +11,18 @@ $listings_list     =   '';
 if( !is_tax() ){
     $show_filter_area  =   get_post_meta($post->ID, 'show_filter_area', true);
 }
-$current_adv_filter_search_meta     = 'All Actions';
-$current_adv_filter_category_meta   = 'All Types';
-$current_adv_filter_city_meta       = 'All Cities';
-$current_adv_filter_area_meta       = 'All Areas';
-$current_adv_filter_county_meta       = 'All Counties/States';       
+$current_adv_filter_search_meta     = 'Types';
+$current_adv_filter_category_meta   = 'Categories';
+$current_adv_filter_city_meta       = 'Cities';
+$current_adv_filter_area_meta       = 'Areas';
+$current_adv_filter_county_meta     = 'States';       
 if( is_tax() ){
     $show_filter_area = 'yes';
-    $current_adv_filter_search_label    =__('All Actions','wpestate');
-    $current_adv_filter_category_label  =__('All Types','wpestate');
-    $current_adv_filter_city_label      =__('All Cities','wpestate');
-    $current_adv_filter_area_label      =__('All Areas','wpestate');
-    $current_adv_filter_county_label    =__('All Counties/States','wpestate');
+    $current_adv_filter_search_label    =esc_html__('Types','wpresidence');
+    $current_adv_filter_category_label  =esc_html__('Categories','wpresidence');
+    $current_adv_filter_city_label      =esc_html__('Cities','wpresidence');
+    $current_adv_filter_area_label      =esc_html__('Areas','wpresidence');
+    $current_adv_filter_county_label    =esc_html__('States','wpresidence');
     
     $taxonmy                            = get_query_var('taxonomy');
     $term                               = single_cat_title('',false);
@@ -51,14 +51,10 @@ if( is_tax() ){
     }
     
 }
-
-
 ?>
 
-
-<div data-toggle="dropdown" id="second_filter_action" class="hide" data-value="<?php print $current_adv_filter_search_meta;?>"><?php print esc_html($current_adv_filter_search_label);?></div>           
-<div data-toggle="dropdown" id="second_filter_categ" class="hide" data-value="<?php print $current_adv_filter_category_meta;?>"><?php print esc_html($current_adv_filter_category_label);?></div>           
-<div data-toggle="dropdown" id="second_filter_cities" class="hide" data-value="<?php print $current_adv_filter_city_meta;?>"><?php print esc_html($current_adv_filter_city_label);?></div>           
-<div data-toggle="dropdown" id="second_filter_areas"  class="hide" data-value="<?php print $current_adv_filter_area_meta;?>"><?php print esc_html($current_adv_filter_area_label);?></div>           
-<div data-toggle="dropdown" id="second_filter_county"  class="hide" data-value="<?php print $current_adv_filter_county_meta;?>"><?php print esc_html($current_adv_filter_county_label);?></div>           
-      
+<div data-toggle="dropdown" id="second_filter_action" class="hide" data-value="<?php print esc_attr( $current_adv_filter_search_meta);?>"><?php print esc_html($current_adv_filter_search_label);?></div>           
+<div data-toggle="dropdown" id="second_filter_categ" class="hide" data-value="<?php  print esc_attr( $current_adv_filter_category_meta);?>"><?php print esc_html($current_adv_filter_category_label);?></div>           
+<div data-toggle="dropdown" id="second_filter_cities" class="hide" data-value="<?php print esc_attr( $current_adv_filter_city_meta);?>"><?php print esc_html($current_adv_filter_city_label);?></div>           
+<div data-toggle="dropdown" id="second_filter_areas"  class="hide" data-value="<?php print esc_attr( $current_adv_filter_area_meta);?>"><?php print esc_html($current_adv_filter_area_label);?></div>           
+<div data-toggle="dropdown" id="second_filter_county"  class="hide" data-value="<?php print esc_attr( $current_adv_filter_county_meta);?>"><?php print esc_html($current_adv_filter_county_label);?></div>    

@@ -1,14 +1,62 @@
 <?php
 
+if( !function_exists('wpestate_dashboard_header_permissions') ):
+function wpestate_dashboard_header_permissions(){
+    // check if plugin is activated
+    if(!function_exists('wpestate_residence_functionality')){
+        esc_html_e('This page will not work without WpResidence Core Plugin, Please activate it from the plugins menu!','wpresidence');
+        exit();
+    }
+
+    $current_page = basename( get_page_template() );
+    // check if user is logged
+    if($current_page!=='user_dashboard_profile.php'){
+        if ( !is_user_logged_in() ) {   
+            wp_redirect(  esc_url(home_url('/')) );
+            exit;
+        } 
+        
+        // check if user permissions are set.
+        if(function_exists('wpestate_check_user_permission_on_dashboard')){
+            if( !wpestate_check_user_permission_on_dashboard() ){
+                wp_redirect(  esc_url(home_url('/')) );
+                exit;
+            }
+        }
+    }
+
+
+   
+}
+endif;
+
+
+
+
+
+if( !function_exists('wpestate_property_size_number_format') ):
+function wpestate_property_size_number_format($value){
+    $th_separator   =  stripslashes(  wpresidence_get_option('wp_estate_size_thousand_separator','') );
+    $decimals       =  stripslashes(  wpresidence_get_option('wp_estate_size_decimals','') );
+        
+    $value = number_format($value,$decimals,'.',$th_separator);
+    return $value;
+}
+endif;
+
+
+
+
+
 
 if( !function_exists('wpestate_show_price_label_slider') ):
-function wpestate_show_price_label_slider($min_price_slider,$max_price_slider,$currency,$where_currency){
+function wpestate_show_price_label_slider($min_price_slider,$max_price_slider,$wpestate_currency,$where_currency){
 
-    $th_separator       =  stripslashes(  get_option('wp_estate_prices_th_separator','') );
+    $th_separator       =  stripslashes(  wpresidence_get_option('wp_estate_prices_th_separator','') );
     
         
-    $custom_fields = get_option( 'wp_estate_multi_curr', true);
-    //print_r($_COOKIE);
+    $custom_fields = wpresidence_get_option( 'wp_estate_multi_curr', '');
+
     if( !empty($custom_fields) && isset($_COOKIE['my_custom_curr']) &&  isset($_COOKIE['my_custom_curr_pos']) &&  isset($_COOKIE['my_custom_curr_symbol']) && $_COOKIE['my_custom_curr_pos']!=-1){
         $i=intval($_COOKIE['my_custom_curr_pos']);
         
@@ -17,14 +65,14 @@ function wpestate_show_price_label_slider($min_price_slider,$max_price_slider,$c
             $max_price_slider       =   $max_price_slider * $custom_fields[$i][2];
         }
         
-        $currency               =   $custom_fields[$i][0];
+        $wpestate_currency               =   $custom_fields[$i][0];
         $min_price_slider   =   number_format($min_price_slider,0,'.',$th_separator);
         $max_price_slider   =   number_format($max_price_slider,0,'.',$th_separator);
         
         if ($custom_fields[$i][3] == 'before') {  
-            $price_slider_label = $currency .' '. $min_price_slider.' '.__('to','wpestate').' '.$currency .' '. $max_price_slider;      
+            $price_slider_label = $wpestate_currency .' '. $min_price_slider.' '.esc_html__('to','wpresidence').' '.$wpestate_currency .' '. $max_price_slider;      
         } else {
-            $price_slider_label =  $min_price_slider.' '.$currency.' '.__('to','wpestate').' '.$max_price_slider.' '.$currency;      
+            $price_slider_label =  $min_price_slider.' '.$wpestate_currency.' '.esc_html__('to','wpresidence').' '.$max_price_slider.' '.$wpestate_currency;      
         }
         
     }else{
@@ -32,9 +80,9 @@ function wpestate_show_price_label_slider($min_price_slider,$max_price_slider,$c
         $max_price_slider   =   number_format($max_price_slider,0,'.',$th_separator);
         
         if ($where_currency == 'before') {
-            $price_slider_label = $currency .' '.($min_price_slider).' '.__('to','wpestate').' '.$currency .' ' .$max_price_slider;
+            $price_slider_label = $wpestate_currency .' '.($min_price_slider).' '.esc_html__('to','wpresidence').' '.$wpestate_currency .' ' .$max_price_slider;
         } else {
-            $price_slider_label =  $min_price_slider.' '.$currency.' '.__('to','wpestate').' '.$max_price_slider.' '.$currency;
+            $price_slider_label =  $min_price_slider.' '.$wpestate_currency.' '.esc_html__('to','wpresidence').' '.$max_price_slider.' '.$wpestate_currency;
         }  
     }
     
@@ -45,11 +93,6 @@ function wpestate_show_price_label_slider($min_price_slider,$max_price_slider,$c
 endif;
 
 
-///////////////////////////////////////////////////////////////////////////////////////////
-/////// disable toolbar for subscribers
-///////////////////////////////////////////////////////////////////////////////////////////
-
-if (!current_user_can('manage_options') ) { show_admin_bar(false); }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 /////// Define thumb sizes
@@ -58,21 +101,17 @@ if (!current_user_can('manage_options') ) { show_admin_bar(false); }
 if( !function_exists('wpestate_image_size') ): 
     function wpestate_image_size(){
         add_image_size('user_picture_profile', 255, 143, true);
-        //  add_image_size('agent_picture_single_page', 320, 180, true);
         add_image_size('agent_picture_thumb' , 120, 120, true);
         add_image_size('blog_thumb'          , 272, 189, true);
         add_image_size('blog_unit'           , 1110, 385, true);
         add_image_size('slider_thumb'        , 143,  83, true);
         add_image_size('property_featured_sidebar',768,662,true);
-        //  add_image_size('property_featured_sidebar',261,225,true);
-        // add_image_size('blog-full'           , 940, 529, true);
         add_image_size('property_listings'   , 525, 328, true); // 1.62 was 265/163 until v1.12
         add_image_size('property_full'       , 980, 777, true);
         add_image_size('listing_full_slider' , 835, 467, true);
         add_image_size('listing_full_slider_1', 1110, 623, true);
         add_image_size('property_featured'   , 940, 390, true);
         add_image_size('property_full_map'   , 1920, 790, true);
-        add_image_size('property_map1'       , 400, 161, true);
         add_image_size('widget_thumb'        , 105, 70, true);
         add_image_size('user_thumb'          , 45, 45, true);
         add_image_size('custom_slider_thumb'          , 36, 36, true);
@@ -85,171 +124,6 @@ endif;
 ///////////////////////////////////////////////////////////////////////////////////////////
 
 
-
-if( !function_exists('wpestate_widgets_init') ):
-function wpestate_widgets_init() {
-    register_nav_menu( 'primary', __( 'Primary Menu', 'wpestate' ) ); 
-    register_nav_menu( 'mobile', __( 'Mobile Menu', 'wpestate' ) ); 
-    register_nav_menu( 'footer_menu', __( 'Footer Menu', 'wpestate' ) ); 
-    
-    register_sidebar(array(
-        'name' => __('Primary Widget Area', 'wpestate'),
-        'id' => 'primary-widget-area',
-        'description' => __('The primary widget area', 'wpestate'),
-        'before_widget' => '<li id="%1$s" class="widget-container %2$s">',
-        'after_widget' => '</li>',
-        'before_title' => '<h3 class="widget-title-sidebar">',
-        'after_title' => '</h3>',
-    ));
-
-
-    register_sidebar(array(
-        'name' => __('Secondary Widget Area', 'wpestate'),
-        'id' => 'secondary-widget-area',
-        'description' => __('The secondary widget area', 'wpestate'),
-        'before_widget' => '<li id="%1$s" class="widget-container %2$s">',
-        'after_widget' => '</li>',
-        'before_title' => '<h3 class="widget-title-sidebar">',
-        'after_title' => '</h3>',
-    ));
-
-
-    register_sidebar(array(
-        'name' => __('First Footer Widget Area', 'wpestate'),
-        'id' => 'first-footer-widget-area',
-        'description' => __('The first footer widget area', 'wpestate'),
-        'before_widget' => '<li id="%1$s" class="widget-container %2$s">',
-        'after_widget' => '</li>',
-        'before_title' => '<h3 class="widget-title-footer">',
-        'after_title' => '</h3>',
-    ));
-
-
-    register_sidebar(array(
-        'name' => __('Second Footer Widget Area', 'wpestate'),
-        'id' => 'second-footer-widget-area',
-        'description' => __('The second footer widget area', 'wpestate'),
-        'before_widget' => '<li id="%1$s" class="widget-container %2$s">',
-        'after_widget' => '</li>',
-        'before_title' => '<h3 class="widget-title-footer">',
-        'after_title' => '</h3>',
-    ));
-
-
-    register_sidebar(array(
-        'name' => __('Third Footer Widget Area', 'wpestate'),
-        'id' => 'third-footer-widget-area',
-        'description' => __('The third footer widget area', 'wpestate'),
-        'before_widget' => '<li id="%1$s" class="widget-container %2$s">',
-        'after_widget' => '</li>',
-        'before_title' => '<h3 class="widget-title-footer">',
-        'after_title' => '</h3>',
-    ));
-
-
-    register_sidebar(array(
-        'name' => __('Fourth Footer Widget Area', 'wpestate'),
-        'id' => 'fourth-footer-widget-area',
-        'description' => __('The fourth footer widget area', 'wpestate'),
-        'before_widget' => '<li id="%1$s" class="widget-container %2$s">',
-        'after_widget' => '</li>',
-        'before_title' => '<h3 class="widget-title-footer">',
-        'after_title' => '</h3>',
-    ));
-    
-    
-    register_sidebar(array(
-        'name' => __('Top Bar Left Widget Area', 'wpestate'),
-        'id' => 'top-bar-left-widget-area',
-        'description' => __('The top bar left widget area', 'wpestate'),
-        'before_widget' => '<li id="%1$s" class="widget-container %2$s">',
-        'after_widget' => '</li>',
-        'before_title' => '<h3 class="widget-title-topbar">',
-        'after_title' => '</h3>',
-    ));
-       
-    register_sidebar(array(
-        'name' => __('Top Bar Right Widget Area', 'wpestate'),
-        'id' => 'top-bar-right-widget-area',
-        'description' => __('The top bar right widget area', 'wpestate'),
-        'before_widget' => '<li id="%1$s" class="widget-container %2$s">',
-        'after_widget' => '</li>',
-        'before_title' => '<h3 class="widget-title-topbar">',
-        'after_title' => '</h3>',
-    ));
-      register_sidebar(array(
-        'name' => __('Sidebar Menu Widget Area - Before Menu', 'wpestate'),
-        'id' => 'sidebar-menu-widget-area-before',
-        'description' => __('Sidebar for header type 3 - before menu', 'wpestate'),
-        'before_widget' => '<li id="%1$s" class="widget-container %2$s">',
-        'after_widget' => '</li>',
-        'before_title' => '<h3 class="widget-title-topbar">',
-        'after_title' => '</h3>',
-    ));
-    register_sidebar(array(
-        'name' => __('Sidebar Menu Widget Area - After Menu', 'wpestate'),
-        'id' => 'sidebar-menu-widget-area-after',
-        'description' => __('Sidebar for header type 3 - after menu', 'wpestate'),
-        'before_widget' => '<li id="%1$s" class="widget-container %2$s">',
-        'after_widget' => '</li>',
-        'before_title' => '<h3 class="widget-title-topbar">',
-        'after_title' => '</h3>',
-    ));
-       
-    
-    
-    register_sidebar(array(
-        'name' => __('Header4 Widget Area', 'wpestate'),
-        'id' => 'header4-widget-area',
-        'description' => __('Header4 widget area', 'wpestate'),
-        'before_widget' => '<li id="%1$s" class="widget-container %2$s">',
-        'after_widget' => '</li>',
-        'before_title' => '<h3 class="widget-title-header4">',
-        'after_title' => '</h3>',
-    ));
-
-    
-     register_sidebar(array(
-        'name' => __('Dashboard Top Bar Left Widget Area', 'wpestate'),
-        'id' => 'dashboard-top-bar-left-widget-area',
-        'description' => __('User Dashboard - The top bar left widget area', 'wpestate'),
-        'before_widget' => '<li id="%1$s" class="widget-container %2$s">',
-        'after_widget' => '</li>',
-        'before_title' => '<h3 class="widget-title-topbar">',
-        'after_title' => '</h3>',
-    ));
-       
-    register_sidebar(array(
-        'name' => __('Dashboard Top Bar Right Widget Area', 'wpestate'),
-        'id' => 'dashboard-top-bar-right-widget-area',
-        'description' => __('User Dashboard - The top bar right widget area', 'wpestate'),
-        'before_widget' => '<li id="%1$s" class="widget-container %2$s">',
-        'after_widget' => '</li>',
-        'before_title' => '<h3 class="widget-title-topbar">',
-        'after_title' => '</h3>',
-    ));
-    
-    register_sidebar(array(
-        'name' => __('Splash Page Bottom Right Widget Area', 'wpestate'),
-        'id' => 'splash-page_bottom-right-widget-area',
-        'description' => __('Splash Page - Bottom right area', 'wpestate'),
-        'before_widget' => '<li id="%1$s" class="splash_page_widget widget-container %2$s">',
-        'after_widget' => '</li>',
-        'before_title' => '<h3 class="widget-title-topbar">',
-        'after_title' => '</h3>',
-    ));
-    
-    register_sidebar(array(
-        'name' => __('Splash Page Bottom Left Widget Area', 'wpestate'),
-        'id' => 'splash-page_bottom-left-widget-area',
-        'description' => __('Splash Page - Bottom left area', 'wpestate'),
-        'before_widget' => '<li id="%1$s" class="splash_page_widget widget-container %2$s">',
-        'after_widget' => '</li>',
-        'before_title' => '<h3 class="widget-title-topbar">',
-        'after_title' => '</h3>',
-    ));
-}
-endif; // end   wpestate_widgets_init  
 
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -296,11 +170,16 @@ endif; // end   wpestate_strip_words
 
 
 if( !function_exists('wpestate_strip_excerpt_by_char') ):
-    function wpestate_strip_excerpt_by_char($text, $chars_no,$post_id) {
+    function wpestate_strip_excerpt_by_char($text, $chars_no,$post_id,$more='') {
         $return_string  = '';
         $return_string  =  mb_substr( $text,0,$chars_no); 
             if(mb_strlen($text)>$chars_no){
-                $return_string.= ' <a href="'.get_permalink($post_id).'" class="unit_more_x">'.__('[more]','wpestate').'</a>';   
+                if($more==''){
+                    $return_string.= ' <a href="'.esc_url ( get_permalink($post_id)).'" class="unit_more_x">'.esc_html__('[more]','wpresidence').'</a>';   
+                }else{
+                    $return_string.= ' <a href="'.esc_url(get_permalink($post_id)).'" class="unit_more_x">'.$more.'</a>';
+                }
+                    
             } 
         return $return_string;
         }
@@ -312,7 +191,7 @@ if( !function_exists('wpestate_strip_excerpt_by_char_places') ):
         $return_string  = '';
         $return_string  =  mb_substr( $text,0,$chars_no); 
             if(mb_strlen($text)>$chars_no){
-                $return_string.= ' <a href="'.$link.'" class="unit_more_x">'.__('[more]','wpestate').'</a>';   
+                $return_string.= ' <a href="'.esc_url($link).'" class="unit_more_x">'.esc_html__('[more]','wpresidence').'</a>';   
             } 
         return $return_string;
         }
@@ -342,7 +221,7 @@ add_filter( 'video_embed_html', 'wpestate_embed_html' ); // Jetpack
 /////////////////////////////////////////////////////////////////////////////////////////
 ///// html in conmment
 /////////////////////////////////////////////////////////////////////////////////////////
-add_action('init', 'wpestate_html_tags_code', 10);
+//add_action('init', 'wpestate_html_tags_code', 10);
 
 if( !function_exists('wpestate_html_tags_code') ): 
     function wpestate_html_tags_code() {
@@ -355,7 +234,9 @@ if( !function_exists('wpestate_html_tags_code') ):
           'code' => array(),
           'a' => array(
             'href' => array (),
-            'title' => array ())
+            'title' => array (),
+            'class'=>array(),  
+            )
       );
 
       $allowedtags = array(
@@ -365,9 +246,180 @@ if( !function_exists('wpestate_html_tags_code') ):
           'code' => array(),
           'a' => array(
             'href' => array (),
-            'title' => array ())
+            'title' => array (),
+            'class'=>array(),  )
       );
     }
 endif;
+
+
+add_action( 'widgets_init', 'wpestate_widgets_init' );
+if( !function_exists('wpestate_widgets_init') ):
+function wpestate_widgets_init() {
+    register_nav_menu( 'primary', esc_html__( 'Primary Menu', 'wpresidence' ) ); 
+    register_nav_menu( 'mobile', esc_html__( 'Mobile Menu', 'wpresidence' ) ); 
+    register_nav_menu( 'footer_menu', esc_html__( 'Footer Menu', 'wpresidence' ) ); 
+    
+    register_sidebar(array(
+        'name' => esc_html__('Primary Widget Area', 'wpresidence'),
+        'id' => 'primary-widget-area',
+        'description' => esc_html__('The primary widget area', 'wpresidence'),
+        'before_widget' => '<li id="%1$s" class="widget-container %2$s">',
+        'after_widget' => '</li>',
+        'before_title' => '<h3 class="widget-title-sidebar">',
+        'after_title' => '</h3>',
+    ));
+
+
+    register_sidebar(array(
+        'name' => esc_html__('Secondary Widget Area', 'wpresidence'),
+        'id' => 'secondary-widget-area',
+        'description' => esc_html__('The secondary widget area', 'wpresidence'),
+        'before_widget' => '<li id="%1$s" class="widget-container %2$s">',
+        'after_widget' => '</li>',
+        'before_title' => '<h3 class="widget-title-sidebar">',
+        'after_title' => '</h3>',
+    ));
+
+
+    register_sidebar(array(
+        'name' => esc_html__('First Footer Widget Area', 'wpresidence'),
+        'id' => 'first-footer-widget-area',
+        'description' => esc_html__('The first footer widget area', 'wpresidence'),
+        'before_widget' => '<li id="%1$s" class="widget-container %2$s">',
+        'after_widget' => '</li>',
+        'before_title' => '<h4 class="widget-title-footer">',
+        'after_title' => '</h4>',
+    ));
+
+
+    register_sidebar(array(
+        'name' => esc_html__('Second Footer Widget Area', 'wpresidence'),
+        'id' => 'second-footer-widget-area',
+        'description' => esc_html__('The second footer widget area', 'wpresidence'),
+        'before_widget' => '<li id="%1$s" class="widget-container %2$s">',
+        'after_widget' => '</li>',
+        'before_title' => '<h4 class="widget-title-footer">',
+        'after_title' => '</h4>',
+    ));
+
+
+    register_sidebar(array(
+        'name' => esc_html__('Third Footer Widget Area', 'wpresidence'),
+        'id' => 'third-footer-widget-area',
+        'description' => esc_html__('The third footer widget area', 'wpresidence'),
+        'before_widget' => '<li id="%1$s" class="widget-container %2$s">',
+        'after_widget' => '</li>',
+        'before_title' => '<h4 class="widget-title-footer">',
+        'after_title' => '</h4>',
+    ));
+
+
+    register_sidebar(array(
+        'name' => esc_html__('Fourth Footer Widget Area', 'wpresidence'),
+        'id' => 'fourth-footer-widget-area',
+        'description' => esc_html__('The fourth footer widget area', 'wpresidence'),
+        'before_widget' => '<li id="%1$s" class="widget-container %2$s">',
+        'after_widget' => '</li>',
+        'before_title' => '<h4 class="widget-title-footer">',
+        'after_title' => '</h4>',
+    ));
+    
+    
+    register_sidebar(array(
+        'name' => esc_html__('Top Bar Left Widget Area', 'wpresidence'),
+        'id' => 'top-bar-left-widget-area',
+        'description' => esc_html__('The top bar left widget area', 'wpresidence'),
+        'before_widget' => '<li id="%1$s" class="widget-container %2$s">',
+        'after_widget' => '</li>',
+        'before_title' => '<h3 class="widget-title-topbar">',
+        'after_title' => '</h3>',
+    ));
+       
+    register_sidebar(array(
+        'name' => esc_html__('Top Bar Right Widget Area', 'wpresidence'),
+        'id' => 'top-bar-right-widget-area',
+        'description' => esc_html__('The top bar right widget area', 'wpresidence'),
+        'before_widget' => '<li id="%1$s" class="widget-container %2$s">',
+        'after_widget' => '</li>',
+        'before_title' => '<h3 class="widget-title-topbar">',
+        'after_title' => '</h3>',
+    ));
+      register_sidebar(array(
+        'name' => esc_html__('Sidebar Menu Widget Area - Before Menu', 'wpresidence'),
+        'id' => 'sidebar-menu-widget-area-before',
+        'description' => esc_html__('Sidebar for header type 3 - before menu', 'wpresidence'),
+        'before_widget' => '<li id="%1$s" class="widget-container %2$s">',
+        'after_widget' => '</li>',
+        'before_title' => '<h3 class="widget-title-topbar">',
+        'after_title' => '</h3>',
+    ));
+    register_sidebar(array(
+        'name' => esc_html__('Sidebar Menu Widget Area - After Menu', 'wpresidence'),
+        'id' => 'sidebar-menu-widget-area-after',
+        'description' => esc_html__('Sidebar for header type 3 - after menu', 'wpresidence'),
+        'before_widget' => '<li id="%1$s" class="widget-container %2$s">',
+        'after_widget' => '</li>',
+        'before_title' => '<h3 class="widget-title-topbar">',
+        'after_title' => '</h3>',
+    ));
+       
+    
+    
+    register_sidebar(array(
+        'name' => esc_html__('Header4 Widget Area', 'wpresidence'),
+        'id' => 'header4-widget-area',
+        'description' => esc_html__('Header4 widget area', 'wpresidence'),
+        'before_widget' => '<li id="%1$s" class="widget-container %2$s">',
+        'after_widget' => '</li>',
+        'before_title' => '<h3 class="widget-title-header4">',
+        'after_title' => '</h3>',
+    ));
+
+    
+     register_sidebar(array(
+        'name' => esc_html__('Dashboard Top Bar Left Widget Area', 'wpresidence'),
+        'id' => 'dashboard-top-bar-left-widget-area',
+        'description' => esc_html__('User Dashboard - The top bar left widget area', 'wpresidence'),
+        'before_widget' => '<li id="%1$s" class="widget-container %2$s">',
+        'after_widget' => '</li>',
+        'before_title' => '<h3 class="widget-title-topbar">',
+        'after_title' => '</h3>',
+    ));
+       
+    register_sidebar(array(
+        'name' => esc_html__('Dashboard Top Bar Right Widget Area', 'wpresidence'),
+        'id' => 'dashboard-top-bar-right-widget-area',
+        'description' => esc_html__('User Dashboard - The top bar right widget area', 'wpresidence'),
+        'before_widget' => '<li id="%1$s" class="widget-container %2$s">',
+        'after_widget' => '</li>',
+        'before_title' => '<h3 class="widget-title-topbar">',
+        'after_title' => '</h3>',
+    ));
+    
+    register_sidebar(array(
+        'name' => esc_html__('Splash Page Bottom Right Widget Area', 'wpresidence'),
+        'id' => 'splash-page_bottom-right-widget-area',
+        'description' => esc_html__('Splash Page - Bottom right area', 'wpresidence'),
+        'before_widget' => '<li id="%1$s" class="splash_page_widget widget-container %2$s">',
+        'after_widget' => '</li>',
+        'before_title' => '<h3 class="widget-title-topbar">',
+        'after_title' => '</h3>',
+    ));
+    
+    register_sidebar(array(
+        'name' => esc_html__('Splash Page Bottom Left Widget Area', 'wpresidence'),
+        'id' => 'splash-page_bottom-left-widget-area',
+        'description' => esc_html__('Splash Page - Bottom left area', 'wpresidence'),
+        'before_widget' => '<li id="%1$s" class="splash_page_widget widget-container %2$s">',
+        'after_widget' => '</li>',
+        'before_title' => '<h3 class="widget-title-topbar">',
+        'after_title' => '</h3>',
+    ));
+}
+endif; // end   wpestate_widgets_init  
+
+
+
 
 ?>

@@ -1,201 +1,374 @@
 <?php
-
-
-if(!function_exists('wpestate_custom_fonts_elements')):
-    function wpestate_custom_fonts_elements(){
-        $style='';
-        $h1_fontfamily =    esc_html( get_option('wp_estate_h1_fontfamily', '') );
-        $h1_fontfamily =    str_replace('+', ' ', $h1_fontfamily);
-        $h1_fontsubset =    esc_html( get_option('wp_estate_h1_fontsubset', '') );
-        $h1_fontsize   =    esc_html( get_option('wp_estate_h1_fontsize') );
-        $h1_lineheight =    esc_html( get_option('wp_estate_h1_lineheight') );
-        $h1_fontweight =    esc_html( get_option('wp_estate_h1_fontweight') );
-
-       
-        if ($h1_fontfamily != '') {
-            $style.= 'h1,h1 a{font-family:"' . $h1_fontfamily .'";}';
-        }     
-        if ($h1_fontsize != '') { 
-            $style.= 'h1,h1 a{font-size:' . $h1_fontsize .'px;}';
-        }
-        if ($h1_lineheight != '') {  
-            $style.= 'h1,h1 a{line-height:' . $h1_lineheight .'px;}';
-        }
-        if ($h1_fontweight != '') {  
-            $style.=  'h1,h1 a,.entry-title{font-weight:' . $h1_fontweight .';}';
-        }
-     
+if(!function_exists('wpestate_generate_user_menu')):
+    function wpestate_generate_user_menu($place=''){
+        $current_user           =   wp_get_current_user();
+        $userID                 =   $current_user->ID;
+        $user_login             =   $current_user->user_login;  
+        $user_agent_id          =   intval( get_user_meta($userID,'user_agent_id',true));
+        $add_link               =   wpestate_get_template_link('user_dashboard_add.php');
+        $add_agent              =   wpestate_get_template_link('user_dashboard_add_agent.php');
+        $dash_profile           =   wpestate_get_template_link('user_dashboard_profile.php');
+        $dash_favorite          =   wpestate_get_template_link('user_dashboard_favorite.php');
+        $dash_link              =   wpestate_get_template_link('user_dashboard.php');
+        $agent_list_link        =   wpestate_get_template_link('user_dashboard_agent_list.php');
+        $dash_searches          =   wpestate_get_template_link('user_dashboard_searches.php');
+        $dash_showing           =   wpestate_get_template_link('user_dashboard_showing.php');
+        $activeprofile          =   '';
+        $activedash             =   '';
+        $activeadd              =   '';
+        $activefav              =   '';
+        $activesearch           =   '';
+        $activeinvoices         =   '';
+        $user_pack              =   get_the_author_meta( 'package_id' , $userID );    
+        $clientId               =   esc_html( wpresidence_get_option('wp_estate_paypal_client_id','') );
+        $clientSecret           =   esc_html( wpresidence_get_option('wp_estate_paypal_client_secret','') );  
+        $user_registered        =   get_the_author_meta( 'user_registered' , $userID );
+        $user_package_activation=   get_the_author_meta( 'package_activation' , $userID );
+        $home_url               =   esc_url(home_url('/'));
+        $dash_invoices          =   wpestate_get_template_link('user_dashboard_invoices.php');
+        $dash_inbox             =   wpestate_get_template_link('user_dashboard_inbox.php');
+        $activeinbox            =   '';
+        $activeshowing          =   '';
+        $activeaddagent         =   '';
+        $activeagentlist        =   '';
+        if ( basename( get_page_template() ) == 'user_dashboard.php' ){
+            $activedash  =   'user_tab_active';    
+        }else if ( basename( get_page_template() ) == 'user_dashboard_add.php' ){
+            $activeadd   =   'user_tab_active';
+        }else if ( basename( get_page_template() ) == 'user_dashboard_profile.php' ){
+            $activeprofile   =   'user_tab_active';
+        }else if ( basename( get_page_template() ) == 'user_dashboard_favorite.php' ){
+            $activefav   =   'user_tab_active';
+        }else if( basename( get_page_template() ) == 'user_dashboard_searches.php' ){
+            $activesearch  =   'user_tab_active';
+        }else if( basename( get_page_template() ) == 'user_dashboard_invoices.php' ){
+            $activeinvoices  =   'user_tab_active';
+        }else if( basename( get_page_template() ) == 'user_dashboard_add_agent.php' ){
+            $activeaddagent =   'user_tab_active';
+        }else if( basename( get_page_template() ) == 'user_dashboard_agent_list.php' ){
+            $activeagentlist =   'user_tab_active';
+        }else if( basename( get_page_template() ) == 'user_dashboard_inbox.php' ){
+            $activeinbox =   'user_tab_active';
+        }else if( basename( get_page_template() ) == 'user_dashboard_showing.php' ){
+            $activeshowing =   'user_tab_active';
+        } 
+    
+        $no_unread  =   intval(get_user_meta($userID,'unread_mess',true));   
+        $user_role  =   get_user_meta( $current_user->ID, 'user_estate_role', true) ;
         
-        $h2_fontfamily =    esc_html( get_option('wp_estate_h2_fontfamily', '') );
-        $h2_fontfamily =    str_replace('+', ' ', $h2_fontfamily);
-        $h2_fontsize   =    esc_html( get_option('wp_estate_h2_fontsize') );
-        $h2_lineheight =    esc_html( get_option('wp_estate_h2_lineheight') );
-        $h2_fontweight =    esc_html( get_option('wp_estate_h2_fontweight') );
-
-
-     
-        if ($h2_fontfamily != '') {
-            $style.=  'h2,h2 a{font-family:"' . $h2_fontfamily .'";}';
-        }     
-        if ($h2_fontsize != '') { 
-            $style.=  'h2,h2 a{font-size:' . $h2_fontsize .'px;}';
-        }
-        if ($h2_lineheight != '') {  
-            $style.=  'h2,h2 a{line-height:' . $h2_lineheight .'px;}';
-        }
-        if ($h2_fontweight != '') {  
-            $style.=  'h2,h2 a{font-weight:' . $h2_fontweight .';}';
-        }
-          
- 
-        $h3_fontfamily =    esc_html( get_option('wp_estate_h3_fontfamily', '') );
-        $h3_fontfamily =    str_replace('+', ' ', $h3_fontfamily);
-        $h3_fontsize   =    esc_html( get_option('wp_estate_h3_fontsize') );
-        $h3_lineheight =    esc_html( get_option('wp_estate_h3_lineheight') );
-        $h3_fontweight =    esc_html( get_option('wp_estate_h3_fontweight') );
-     
-        if ($h3_fontfamily != '') {
-            $style.=  'h3,h3 a{font-family:"' . $h3_fontfamily .'";}';
-        }     
-        if ($h3_fontsize != '') { 
-            $style.=  'h3,h3 a{font-size:' . $h3_fontsize .'px;}';
-        }if ($h3_lineheight != '') {  
-            $style.=  'h3,h3 a{line-height:' . $h3_lineheight .'px;}';
-        }
-        if ($h3_fontweight != '') {  
-            $style.=  'h3,h3 a{font-weight:' . $h3_fontweight .';}';
-        }
-
+        if( $dash_profile!=$home_url && $dash_profile!='' ){ ?>
+            <li role="presentation">
+                <a href="<?php print esc_url($dash_profile);?>" class="<?php print esc_attr($activeprofile); ?>">
+                    <i class="fas fa-cog"></i> <?php  esc_html_e('My Profile','wpresidence');?>
+                </a>
+            </li>
+        <?php } ?>
         
-        $h4_fontfamily =    esc_html( get_option('wp_estate_h4_fontfamily', '') );
-        $h4_fontfamily =    str_replace('+', ' ', $h4_fontfamily);
-        $h4_fontsize   =    esc_html( get_option('wp_estate_h4_fontsize') );
-        $h4_lineheight =    esc_html( get_option('wp_estate_h4_lineheight') );
-        $h4_fontweight =    esc_html( get_option('wp_estate_h4_fontweight') );
-        
-        if ($h4_fontfamily != '') {
-             $style.=  'h4,h4 a{font-family:"' . $h4_fontfamily .'";}';
-        }     
-        if ($h4_fontsize != '') { 
-            $style.=  'h4,h4 a{font-size:' . $h4_fontsize .'px;}';
-        }
-        if ($h4_lineheight != '') {  
-            $style.=  'h4,h4 a{line-height:' . $h4_lineheight .'px;}';
-        }
-        if ($h4_fontweight != '') {  
-            $style.=  'h4,h4 a{font-weight:' . $h4_fontweight .';}';
-        }
-         
-        
-        $h5_fontfamily =    esc_html( get_option('wp_estate_h5_fontfamily', '') );
-        $h5_fontfamily =    str_replace('+', ' ', $h5_fontfamily);
-        $h5_fontsize   =    esc_html( get_option('wp_estate_h5_fontsize') );
-        $h5_lineheight =    esc_html( get_option('wp_estate_h5_lineheight') );
-        $h5_fontweight =    esc_html( get_option('wp_estate_h5_fontweight') );
-
-        if ($h5_fontfamily != '') {
-            $style.= 'h5,h5 a{font-family:"' . $h5_fontfamily .'";}';
-        }     
-        if ($h5_fontsize != '') { 
-            $style.= 'h5,h5 a{font-size:' . $h5_fontsize .'px;}';
-        }
-        if ($h5_lineheight != '') {  
-            $style.= 'h5,h5 a{line-height:' . $h5_lineheight .'px;}';
-        }
-        if ($h5_fontweight != '') {  
-            $style.= 'h5,h5 a{font-weight:' . $h5_fontweight .';}';
-        }
-          
-        $h6_fontfamily =    esc_html( get_option('wp_estate_h6_fontfamily', '') );
-        $h6_fontfamily =    str_replace('+', ' ', $h6_fontfamily);
-        $h6_fontsize   =    esc_html( get_option('wp_estate_h6_fontsize') );
-        $h6_lineheight =    esc_html( get_option('wp_estate_h6_lineheight') );
-        $h6_fontweight =    esc_html( get_option('wp_estate_h6_fontweight') );
-
-        if ($h6_fontfamily != '') {
-            $style.=  'h6,h6 a{font-family:"' . $h6_fontfamily .'";}';
-        }     
-        if ($h6_fontsize != '') { 
-           $style.=  'h6,h6 a{font-size:' . $h6_fontsize .'px;}';
-        }if ($h6_lineheight != '') {  
-           $style.=  'h6,h6 a{line-height:' . $h6_lineheight .'px;}';
-        }
-        if ($h6_fontweight != '') {  
-           $style.=  'h6,h6 a{font-weight:' . $h6_fontweight .';}';
-        }
-
-      
-        $p_fontfamily = esc_html( get_option('wp_estate_p_fontfamily', '') );
-        $p_fontfamily = str_replace('+', ' ', $p_fontfamily);
-        $p_fontsize   = esc_html( get_option('wp_estate_p_fontsize') );
-        $p_lineheight = esc_html( get_option('wp_estate_p_lineheight') );
-        $p_fontweight = esc_html( get_option('wp_estate_p_fontweight') );
-
-        if ($p_fontfamily != '') {
-            $style.=  'body,p{font-family:"' . $p_fontfamily .'";}';
-        }     
-        if ($p_fontsize != '') { 
-            $style.=  '.single-content,p,.single-estate_property .listing_detail .price_label{font-size:' . $p_fontsize .'px;}';
-        }
-        if ($p_lineheight != '') {  
-            $style.=  'p{line-height:' . $p_lineheight .'px;}';
-        }
-        if ($p_fontweight != '') {  
-            $style.=  'p{font-weight:' . $p_fontweight .';}';
-        }
-          
-        $menu_fontfamily =  esc_html( get_option('wp_estate_menu_fontfamily', '') );
-        $menu_fontfamily =  str_replace('+', ' ', $menu_fontfamily);
-        $menu_fontsize   =  esc_html( get_option('wp_estate_menu_fontsize') );
-        $menu_lineheight =  esc_html( get_option('wp_estate_menu_lineheight') );
-        $menu_fontweight =  esc_html( get_option('wp_estate_menu_fontweight') );
-
-       
-        if ($menu_fontfamily != '') {
-             $style.= '#access a,#access ul ul a,#user_menu_u{font-family:"' . $menu_fontfamily .'";}';
-        }     
-        if ($menu_fontsize != '') { 
-            $style.= '#access a,#user_menu_u{font-size:' . $menu_fontsize .'px;}';
-        }
-        
-        if ($menu_fontweight != '') {  
-            $style.= '#access a,#user_menu_u{font-weight:' . $menu_fontweight .';}';
-        }
+        <?php 
+        if( $dash_link!=$home_url && $dash_link!='' && wpestate_check_user_permission_on_dashboard( 'user_dashboard' ) ){
+            if($user_agent_id==0 || ( $user_agent_id!=0 && get_post_status($user_agent_id)!='pending' && get_post_status($user_agent_id)!='disabled') ){?>
+                <li role="presentation">
+                    <a href="<?php print esc_url($dash_link);?>"     class="<?php print esc_attr($activedash); ?>">
+                       <i class="fas fa-map-marker-alt"></i> <?php esc_html_e('My Properties List','wpresidence');?>
+                    </a>
+                </li>
+        <?php } 
+        }?>
+            
+            
+        <?php if( $add_link!=$home_url && $add_link!='' && wpestate_check_user_permission_on_dashboard( 'user_dashboard_add' ) ){
+            if($user_agent_id==0 || ( $user_agent_id!=0 && get_post_status($user_agent_id)!='pending' && get_post_status($user_agent_id)!='disabled') ){?>
+                <li role="presentation">
+                    <a href="<?php print esc_url ($add_link);?>"      class="<?php print esc_attr($activeadd); ?>">
+                        <i class="fas fa-plus"></i><?php esc_html_e('Add New Property','wpresidence');?>
+                    </a>
+                </li>
+        <?php }
+        } 
       
         
         
-        
-        
-        if($style!=''){
-            //echo "<style type='text/css'>".$style."</style>";  
-            echo $style; 
+        if($user_role==3 || $user_role ==4){
+            if( $user_agent_id!=0 && get_post_status($user_agent_id)!='pending'){
+            ?>
+            <li role="presentation">
+                <a href="<?php print esc_url ($add_agent);?>" class="<?php print esc_attr($activeaddagent); ?>">
+                    <i class="fas fa-user-plus"></i><?php esc_html_e('Add New Agent','wpresidence');?>
+                </a>
+            </li> 
+            
+            <li role="presentation">
+                <a href="<?php print esc_url ($agent_list_link);?>" class="<?php print esc_attr($activeagentlist); ?>">
+                    <i class="fas fa-user"></i><?php esc_html_e('Agent list','wpresidence');?>
+                </a>
+            </li>
+            
+        <?php
+            }
         }
+        ?>
+            
+            
+            
+        <?php if( $dash_favorite!=$home_url && $dash_favorite!=''  && wpestate_check_user_permission_on_dashboard( 'user_dashboard_favorite' ) ){ ?>
+            <li role="presentation">
+                <a href="<?php print esc_url($dash_favorite);?>" class="<?php print esc_attr($activefav); ?>">
+                    <i class="fas fa-heart"></i> <?php esc_html_e('Favorites','wpresidence');?>
+                </a>
+            </li>
+        <?php } ?>
+            
+            
+            
+        <?php if( $dash_searches!=$home_url && $dash_searches!=''  && wpestate_check_user_permission_on_dashboard( 'user_dashboard_searches' ) ){ ?>
+            <li role="presentation">
+                <a href="<?php print esc_url($dash_searches);?>" class="<?php print esc_attr($activesearch); ?>">
+                    <i class="fas fa-search"></i> <?php esc_html_e('Saved Searches','wpresidence');?>
+                </a>
+            </li>
+        <?php } 
+        
+        
+        
+        if( $dash_invoices!=$home_url && $dash_invoices!=''  && wpestate_check_user_permission_on_dashboard( 'user_dashboard_invoices' ) ){ ?>
+            <li role="presentation">
+                <a href="<?php print esc_url($dash_invoices);?>" class="<?php print esc_attr($activeinvoices); ?>">
+                    <i class="far fa-file-alt"></i><?php esc_html_e('My Invoices','wpresidence');?>
+                </a>
+            </li>
+        <?php } 
+        
+        
+        
+        if($dash_inbox!=$home_url && $dash_inbox!='' && wpestate_check_user_permission_on_dashboard( 'user_dashboard_inbox' ) ){ ?>
+            <li role="presentation">
+                <a href="<?php print esc_url($dash_inbox);?>" class="<?php print esc_attr($activeinbox); ?>"><i class="far fa-envelope"></i> 
+                    <?php esc_html_e('Inbox','wpresidence'); 
+                        if  ($no_unread>0){
+                            echo '<div class="unread_mess">'.intval($no_unread).'</div>';
+                        }
+                    ?>
+                </a>
+            </li>
+        <?php } ?>
+     
+            
+        
+        <?php if($place=='top'){ ?>   
+               <li role="presentation" class="divider"></li>
+        <?php }?>     
+             
+        <li role="presentation"><a href="<?php echo wp_logout_url( esc_url(home_url('/') ) );?>" title="Logout"><i class="fas fa-power-off"></i> <?php esc_html_e('Log Out','wpresidence');?></a></li>
+        
+        <?php
+        
     }
 endif;
 
 
 
 
+if(!function_exists('wpestate_custom_fonts_elements')):
+    function wpestate_custom_fonts_elements(){
+        $style='';
+        $h1_fontfamily =     ( esc_html( wpresidence_get_option('h1_typo','font-family') ));
+        $h1_fontfamily =    wp_specialchars_decode  ( $h1_fontfamily,ENT_QUOTES ); 
+        $h1_fontfamily =    str_replace('+', ' ', $h1_fontfamily);
+        $h1_fontsubset =    esc_html( wpresidence_get_option('h1_typo','subsets') );
+        $h1_fontsize   =    esc_html( wpresidence_get_option('h1_typo','font-size') );
+        $h1_lineheight =    esc_html( wpresidence_get_option('h1_typo','line-height') );
+        $h1_fontweight =    esc_html( wpresidence_get_option('h1_typo','font-weight') );
+
+       
+        if ($h1_fontfamily != '') {
+            $style.= 'h1,h1 a{font-family:' . $h1_fontfamily .';}';
+        }     
+        if ($h1_fontsize != '') { 
+            $style.= 'h1,h1 a{font-size:' . $h1_fontsize .';}';
+        }
+        if ($h1_lineheight != '') {  
+            $style.= 'h1,h1 a{line-height:' . $h1_lineheight .';}';
+        }
+        if ($h1_fontweight != '') {  
+            $style.=  'h1,h1 a,.entry-title{font-weight:' . $h1_fontweight .';}';
+        }
+     
+        
+        $h2_fontfamily =   (  esc_html( wpresidence_get_option('h2_typo','font-family') ) );
+      
+       
+        $h2_fontfamily =    wp_specialchars_decode  ( $h2_fontfamily,ENT_QUOTES ); 
+        $h2_fontfamily =    str_replace('+', ' ', $h2_fontfamily);
+        $h2_fontsize   =    esc_html( wpresidence_get_option('h2_typo','font-size'));
+        $h2_lineheight =    esc_html( wpresidence_get_option('h2_typo','line-height') );
+        $h2_fontweight =    esc_html( wpresidence_get_option('h2_typo','font-weight') );
 
 
+     
+        if ($h2_fontfamily != '') {
+            $style.=  'h2,h2 a{font-family:' . $h2_fontfamily .';}';
+        }     
+        if ($h2_fontsize != '') { 
+            $style.=  'h2,h2 a{font-size:' . $h2_fontsize .';}';
+        }
+        if ($h2_lineheight != '') {  
+            $style.=  'h2,h2 a{line-height:' . $h2_lineheight .';}';
+        }
+        if ($h2_fontweight != '') {  
+            $style.=  'h2,h2 a{font-weight:' . $h2_fontweight .';}';
+        }
+          
+ 
+        $h3_fontfamily =    esc_html(  wpresidence_get_option('h3_typo','font-family') );
+        $h3_fontfamily =    wp_specialchars_decode  ( $h3_fontfamily,ENT_QUOTES ); 
+        $h3_fontfamily =    str_replace('+', ' ', $h3_fontfamily);
+        $h3_fontsize   =    esc_html( wpresidence_get_option('h3_typo','font-size'));
+        $h3_lineheight =    esc_html( wpresidence_get_option('h3_typo','line-height') );
+        $h3_fontweight =    esc_html( wpresidence_get_option('h3_typo','font-weight') );
+     
+        if ($h3_fontfamily != '') {
+            $style.=  'h3,h3 a{font-family:' . $h3_fontfamily .';}';
+        }     
+        if ($h3_fontsize != '') { 
+            $style.=  'h3,h3 a{font-size:' . $h3_fontsize .';}';
+        }if ($h3_lineheight != '') {  
+            $style.=  'h3,h3 a{line-height:' . $h3_lineheight .';}';
+        }
+        if ($h3_fontweight != '') {  
+            $style.=  'h3,h3 a{font-weight:' . $h3_fontweight .';}';
+        }
 
+        
+        $h4_fontfamily =    esc_html( wpresidence_get_option('h4_typo','font-family') );
+        $h4_fontfamily =    wp_specialchars_decode  ( $h4_fontfamily,ENT_QUOTES ); 
+        $h4_fontfamily =    str_replace('+', ' ', $h4_fontfamily);
+        $h4_fontsize   =    esc_html( wpresidence_get_option('h4_typo','font-size') );
+        $h4_lineheight =    esc_html( wpresidence_get_option('h4_typo','line-height') );
+        $h4_fontweight =    esc_html( wpresidence_get_option('h4_typo','font-weight') );
+        
+        if ($h4_fontfamily != '') {
+             $style.=  'h4,h4 a{font-family:' . $h4_fontfamily .';}';
+        }     
+        if ($h4_fontsize != '') { 
+            $style.=  'h4,h4 a{font-size:' . $h4_fontsize .';}';
+        }
+        if ($h4_lineheight != '') {  
+            $style.=  'h4,h4 a{line-height:' . $h4_lineheight .';}';
+        }
+        if ($h4_fontweight != '') {  
+            $style.=  'h4,h4 a{font-weight:' . $h4_fontweight .';}';
+        }
+         
+        
+        $h5_fontfamily =    esc_html( wpresidence_get_option('h5_typo','font-family') );
+        $h5_fontfamily =    wp_specialchars_decode  ( $h5_fontfamily,ENT_QUOTES ); 
+        $h5_fontfamily =    str_replace('+', ' ', $h5_fontfamily);
+        $h5_fontsize   =    esc_html( wpresidence_get_option('h5_typo','font-size') );
+        $h5_lineheight =    esc_html( wpresidence_get_option('h5_typo','line-height') );
+        $h5_fontweight =    esc_html( wpresidence_get_option('h5_typo','font-weight') );
 
+        if ($h5_fontfamily != '') {
+            $style.= 'h5,h5 a{font-family:' . $h5_fontfamily .';}';
+        }     
+        if ($h5_fontsize != '') { 
+            $style.= 'h5,h5 a{font-size:' . $h5_fontsize .';}';
+        }
+        if ($h5_lineheight != '') {  
+            $style.= 'h5,h5 a{line-height:' . $h5_lineheight .';}';
+        }
+        if ($h5_fontweight != '') {  
+            $style.= 'h5,h5 a{font-weight:' . $h5_fontweight .';}';
+        }
+          
+        $h6_fontfamily =    esc_html( wpresidence_get_option('h6_typo','font-family') );
+        $h6_fontfamily =    wp_specialchars_decode  ( $h6_fontfamily,ENT_QUOTES );
+        $h6_fontfamily =    str_replace('+', ' ', $h6_fontfamily);
+        $h6_fontsize   =    esc_html( wpresidence_get_option('h6_typo','font-size') );
+        $h6_lineheight =    esc_html( wpresidence_get_option('h6_typo','line-height') );
+        $h6_fontweight =    esc_html( wpresidence_get_option('h6_typo','font-weight') );
 
+        if ($h6_fontfamily != '') {
+            $style.=  'h6,h6 a{font-family:' . $h6_fontfamily .';}';
+        }     
+        if ($h6_fontsize != '') { 
+           $style.=  'h6,h6 a{font-size:' . $h6_fontsize .';}';
+        }if ($h6_lineheight != '') {  
+           $style.=  'h6,h6 a{line-height:' . $h6_lineheight .';}';
+        }
+        if ($h6_fontweight != '') {  
+           $style.=  'h6,h6 a{font-weight:' . $h6_fontweight .';}';
+        }
+
+      
+        $p_fontfamily = esc_html( wpresidence_get_option('paragraph_typo','font-family') );
+        $p_fontfamily =    wp_specialchars_decode  ( $p_fontfamily,ENT_QUOTES );
+        $p_fontfamily = str_replace('+', ' ', $p_fontfamily);
+        $p_fontsize   = esc_html( wpresidence_get_option('paragraph_typo','font-size') );
+        $p_lineheight = esc_html( wpresidence_get_option('paragraph_typo','line-height') );
+        $p_fontweight = esc_html( wpresidence_get_option('paragraph_typo','font-weight') );
+
+        if ($p_fontfamily != '') {
+            $style.=  'body,p{font-family:' . $p_fontfamily .';}';
+        }     
+        if ($p_fontsize != '') { 
+            $style.=  '.single-content,p,.single-estate_property .listing_detail .price_label{font-size:' . $p_fontsize .';}';
+        }
+        if ($p_lineheight != '') {  
+            $style.=  'p{line-height:' . $p_lineheight .';}';
+        }
+        if ($p_fontweight != '') {  
+            $style.=  'p{font-weight:' . $p_fontweight .';}';
+        }
+          
+        $menu_fontfamily =  esc_html( wpresidence_get_option('menu_typo','font-family') );
+        $menu_fontfamily =    wp_specialchars_decode  ( $menu_fontfamily,ENT_QUOTES );
+        $menu_fontfamily =  str_replace('+', ' ', $menu_fontfamily);
+        $menu_fontsize   =  esc_html( wpresidence_get_option('menu_typo','font-size') );
+        $menu_lineheight =  esc_html( wpresidence_get_option('menu_typo','line-height') );
+        $menu_fontweight =  esc_html( wpresidence_get_option('menu_typo','font-weight') );
+
+       
+        if ($menu_fontfamily != '') {
+             $style.= '#access a,#access ul ul a,#user_menu_u{font-family:"' . $menu_fontfamily .'";}';
+        }     
+        if ($menu_fontsize != '') { 
+            $style.= '#access a,#user_menu_u{font-size:' . $menu_fontsize .';}';
+        }
+        
+        if ($menu_fontweight != '') {  
+            $style.= '#access a,#user_menu_u{font-weight:' . $menu_fontweight .';}';
+        }
+      
+   
+        
+        if($style!=''){
+            print trim($style); 
+        }
+    }
+endif;
 
 
 if( !function_exists('wpestate_general_design_elements') ):
     function wpestate_general_design_elements(){
         global $post;
-        $style='
-        ';   
+        $style='';   
       
+        $wp_estate_logo_max_height                            =   esc_html ( wpresidence_get_option('wp_estate_logo_max_height','') );
+        if($wp_estate_logo_max_height!=''){
+            $style.='.logo img{
+                max-height: '.$wp_estate_logo_max_height.'px;
+            }';
+                      
+        }
+        
+        
       
-        $float_form_top                             =   esc_html ( get_option('wp_estate_float_form_top','') );
-        $float_search_form                          =   esc_html ( get_option('wp_estate_use_float_search_form','') );
+        $float_form_top                             =   esc_html ( wpresidence_get_option('wp_estate_float_form_top','') );
+        $float_search_form                          =   esc_html ( wpresidence_get_option('wp_estate_use_float_search_form','') );
        
         if( is_tax() || is_category() || is_archive() ){
       
-             $float_form_top                          =   esc_html ( get_option('wp_estate_float_form_top_tax','') );
+         $float_form_top                          =   esc_html ( wpresidence_get_option('wp_estate_float_form_top_tax','') );
         }else{
             
             if ( isset($post->ID)){  
@@ -217,112 +390,89 @@ if( !function_exists('wpestate_general_design_elements') ):
             $style='
             #search_wrapper {
                 top: '.$float_form_top.';
-            }
-        ';   
-      
+            }';       
         }
-        
-        
-        $adv_back_color                 =  esc_html ( get_option('wp_estate_adv_back_color','') );
-        $adv_font_color                 =  esc_html ( get_option('wp_estate_adv_font_color','') );
-        $adv_back_color_opacity         =  esc_html ( get_option('wp_estate_adv_back_color_opacity','') );
+
+        $adv_back_color                 =  esc_html ( wpresidence_get_option('wp_estate_adv_back_color','') );
+        $adv_font_color                 =  esc_html ( wpresidence_get_option('wp_estate_adv_font_color','') );
+        $adv_back_color_opacity         =  esc_html ( wpresidence_get_option('wp_estate_adv_back_color_opacity','') );
         if( $adv_back_color  !=''){ 
-            $style.='.adv_results_wrapper .adv-search-1,#search_wrapper_color, #google_map_prop_list_sidebar .adv-search-1  {
-                background-color: #'.$adv_back_color.';
-            }#search_wrapper {
+            $style.='
+                #search_wrapper.with_search_form_float #search_wrapper_color{
+                background-color: '.$adv_back_color.';
+            }
+            #search_wrapper {
                 background:transparent;
             }';
         }
         
         if( $adv_font_color  !=''){ 
             $style.='
-            #adv-search-mobile .adv_extended_options_text i,
-            #search_wrapper,
-            #adv-search-mobile .adv_extended_options_text,
-            #adv-search-mobile adv_extended_options_text i,
-            #adv-search-mobile #amount,
-            #search_wrapper #amount,
-            #search_wrapper .adv_extended_options_text i,
-            #search_wrapper .adv_extended_options_text,
-            .extended_search_checker label,
-            .$currency="",$where_currency label {
-                color: #'.$adv_font_color.';
+            #search_wrapper.with_search_form_float,
+            #search_wrapper.with_search_form_float #amount,
+            #search_wrapper.with_search_form_float .adv_extended_options_text i,
+            #search_wrapper.with_search_form_float .adv_extended_options_text,
+            #search_wrapper.with_search_form_float .extended_search_checker label,
+            #search_wrapper.with_search_form_float .adv_search_slider label,
+            #search_wrapper.with_search_form_float .adv_extended_options_text{
+                color: '.$adv_font_color.';
             }
             
-            #adv-search-mobile #amount_mobile,
-            #search_wrapper #amount{
-                color: #'.$adv_font_color.'!important;
+            #search_wrapper.with_search_form_float #search_wrapper #amount,
+            #search_wrapper.with_search_form_float .adv_search_slider #amount,
+            #search_wrapper.with_search_form_float .adv6-holder .adv_search_slider p label, 
+            #search_wrapper.with_search_form_float .adv6-holder .adv_search_slider p span,
+            #search_wrapper.with_search_form_float #amount_wd {
+                color: '.$adv_font_color.'!important;
             }';
         }
 
         if($adv_back_color_opacity!=''){
-            $style.='#search_wrapper_color {
+            $style.='
+                #search_wrapper.with_search_form_float #search_wrapper_color{
                 opacity: '.floatval($adv_back_color_opacity).';
             }';
         }
-
         
-        
-        
-        $main_grid_content_width                    =   esc_html ( get_option('wp_estate_main_grid_content_width','') );
-        $main_content_width                         =   esc_html ( get_option('wp_estate_main_content_width','') );
-        $header_height                              =   esc_html ( get_option('wp_estate_header_height','') );   
-        $sticky_header_height                       =   esc_html ( get_option('wp_estate_sticky_header_height','') );
-        $border_radius_corner                       =   get_option('wp_estate_border_radius_corner','');
-        $cssbox_shadow                              =   get_option('wp_estate_cssbox_shadow','');
-        $prop_unit_min_height                       =   get_option('wp_estate_prop_unit_min_height','');
-        $border_bottom_header                       =   esc_html ( get_option('wp_estate_border_bottom_header','') );
-        $sticky_border_bottom_header                =   esc_html ( get_option('wp_estate_sticky_border_bottom_header','') );
-        $border_bottom_header_sticky_color          =   esc_html ( get_option('wp_estate_border_bottom_header_sticky_color','') );
-        $border_bottom_header_color                 =   esc_html ( get_option('wp_estate_border_bottom_header_color','') );
-        $cssbox_shadow_value                        =   esc_html ( get_option('wp_estate_cssbox_shadow','') );
-        
-        $property_unit_color                        =   esc_html ( get_option('wp_estate_property_unit_color','') );
-        $propertyunit_internal_padding_top          =   get_option('wp_estate_propertyunit_internal_padding_top','');
-        $propertyunit_internal_padding_left         =   get_option('wp_estate_propertyunit_internal_padding_left','');
-        $propertyunit_internal_padding_bottom       =   get_option('wp_estate_propertyunit_internal_padding_bottom','');
-        $propertyunit_internal_padding_right        =   get_option('wp_estate_propertyunit_internal_padding_right','');
-    
-        $wp_estate_content_area_back_color                   = esc_html ( get_option('wp_estate_content_area_back_color','') );
-        $wp_estate_contentarea_internal_padding_top          = get_option('wp_estate_contentarea_internal_padding_top','');
-        $wp_estate_contentarea_internal_padding_left         = get_option('wp_estate_contentarea_internal_padding_left','');
-        $wp_estate_contentarea_internal_padding_bottom       = get_option('wp_estate_contentarea_internal_padding_bottom','');
-        $wp_estate_contentarea_internal_padding_right        = get_option('wp_estate_contentarea_internal_padding_right','');
-        
-        $blog_unit_min_height       = get_option('wp_estate_blog_unit_min_height','');
-        $agent_unit_min_height      = get_option('wp_estate_agent_unit_min_height','');
-        
-        $unit_border_color          =  esc_html ( get_option('wp_estate_unit_border_color','') );
-        $unit_border_size           = get_option('wp_estate_unit_border_size','');
-        
-        $wp_estate_widget_sidebar_border_size   = get_option('wp_estate_widget_sidebar_border_size','');
-        $widget_sidebar_border_color            =  esc_html ( get_option('wp_estate_widget_sidebar_border_color','') );
-        
-        $map_controls_back                      =  esc_html ( get_option('wp_estate_map_controls_back','') );
-        $map_controls_font_color                =  esc_html ( get_option('wp_estate_map_controls_font_color','') );
-   
-    
-        $sidebarwidget_internal_padding_top         = esc_html ( get_option('wp_estate_sidebarwidget_internal_padding_top','') );
-        $sidebarwidget_internal_padding_left        = esc_html ( get_option('wp_estate_sidebarwidget_internal_padding_left','') ) ;
-        $sidebarwidget_internal_padding_bottom      = esc_html ( get_option('wp_estate_sidebarwidget_internal_padding_bottom','') );
-        $sidebarwidget_internal_padding_right       = esc_html ( get_option('wp_estate_sidebarwidget_internal_padding_right','') ) ;
-        $sidebar_heading_background_color           = esc_html ( get_option('wp_estate_sidebar_heading_background_color','') );
-        $sidebar_widget_color                       = esc_html ( get_option('wp_estate_sidebar_widget_color', '') );
-        $sidebar_heading_color                      = esc_html ( get_option('wp_estate_sidebar_heading_color','') );
-        $sidebar_heading_boxed_color                = esc_html ( get_option('wp_estate_sidebar_heading_boxed_color','') );
-        $sidebar2_font_color                        = esc_html ( get_option('wp_estate_sidebar2_font_color', '') );
-    
-        $wp_estate_use_same_colors_widgets          = esc_html(get_option('wp_estate_use_same_colors_widgets','') );
-
-//        
-//        $adv_position             =  esc_html ( get_option('wp_estate_adv_position','') );
-//
-//        if($adv_position !=''){
-//            $style.='.adv-search-1{bottom:'.$adv_position.';}';
-//        }
-//        
-        if($wp_estate_use_same_colors_widgets=='yes'){
-            $widgett_area_classes= "#primary .widget-container,#primary .agent_contanct_form";   
+        $main_grid_content_width                    =   esc_html ( wpresidence_get_option('wp_estate_main_grid_content_width','') );
+        $main_content_width                         =   esc_html ( wpresidence_get_option('wp_estate_main_content_width','') );
+        $header_height                              =   esc_html ( wpresidence_get_option('wp_estate_header_height','') );   
+        $sticky_header_height                       =   esc_html ( wpresidence_get_option('wp_estate_sticky_header_height','') );
+        $border_radius_corner                       =   wpresidence_get_option('wp_estate_border_radius_corner','');
+        $cssbox_shadow                              =   wpresidence_get_option('wp_estate_cssbox_shadow','');
+        $prop_unit_min_height                       =   wpresidence_get_option('wp_estate_prop_unit_min_height','');
+        $border_bottom_header                       =   esc_html ( wpresidence_get_option('wp_estate_border_bottom_header','') );
+        $sticky_border_bottom_header                =   esc_html ( wpresidence_get_option('wp_estate_sticky_border_bottom_header','') );
+        $border_bottom_header_sticky_color          =   esc_html ( wpresidence_get_option('wp_estate_border_bottom_header_sticky_color','') );
+        $border_bottom_header_color                 =   esc_html ( wpresidence_get_option('wp_estate_border_bottom_header_color','') );
+        $cssbox_shadow_value                        =   esc_html ( wpresidence_get_option('wp_estate_cssbox_shadow','') ); 
+        $property_unit_color                        =   esc_html ( wpresidence_get_option('wp_estate_property_unit_color','') );
+        $propertyunit_internal_padding_top          =   wpresidence_get_option('wp_estate_propertyunit_internal_padding_top','');
+        $propertyunit_internal_padding_left         =   wpresidence_get_option('wp_estate_propertyunit_internal_padding_left','');
+        $propertyunit_internal_padding_bottom       =   wpresidence_get_option('wp_estate_propertyunit_internal_padding_bottom','');
+        $propertyunit_internal_padding_right        =   wpresidence_get_option('wp_estate_propertyunit_internal_padding_right',''); 
+        $wp_estate_content_area_back_color                   = esc_html ( wpresidence_get_option('wp_estate_content_area_back_color','') );
+        $wp_estate_contentarea_internal_padding_top          = wpresidence_get_option('wp_estate_contentarea_internal_padding_top','');
+        $wp_estate_contentarea_internal_padding_left         = wpresidence_get_option('wp_estate_contentarea_internal_padding_left','');
+        $wp_estate_contentarea_internal_padding_bottom       = wpresidence_get_option('wp_estate_contentarea_internal_padding_bottom','');
+        $wp_estate_contentarea_internal_padding_right        = wpresidence_get_option('wp_estate_contentarea_internal_padding_right','');       
+        $blog_unit_min_height       = wpresidence_get_option('wp_estate_blog_unit_min_height','');
+        $agent_unit_min_height      = wpresidence_get_option('wp_estate_agent_unit_min_height','');        
+        $unit_border_color          =  esc_html ( wpresidence_get_option('wp_estate_unit_border_color','') );
+        $unit_border_size           = wpresidence_get_option('wp_estate_unit_border_size','');       
+        $wp_estate_widget_sidebar_border_size   = wpresidence_get_option('wp_estate_widget_sidebar_border_size','');
+        $widget_sidebar_border_color            =  esc_html ( wpresidence_get_option('wp_estate_widget_sidebar_border_color','') );       
+        $map_controls_back                      =  esc_html ( wpresidence_get_option('wp_estate_map_controls_back','') );
+        $map_controls_font_color                =  esc_html ( wpresidence_get_option('wp_estate_map_controls_font_color','') );
+        $sidebarwidget_internal_padding_top         = esc_html ( wpresidence_get_option('wp_estate_sidebarwidget_internal_padding_top','') );
+        $sidebarwidget_internal_padding_left        = esc_html ( wpresidence_get_option('wp_estate_sidebarwidget_internal_padding_left','') ) ;
+        $sidebarwidget_internal_padding_bottom      = esc_html ( wpresidence_get_option('wp_estate_sidebarwidget_internal_padding_bottom','') );
+        $sidebarwidget_internal_padding_right       = esc_html ( wpresidence_get_option('wp_estate_sidebarwidget_internal_padding_right','') ) ;
+        $sidebar_heading_background_color           = esc_html ( wpresidence_get_option('wp_estate_sidebar_heading_background_color','') );
+        $sidebar_widget_color                       = esc_html ( wpresidence_get_option('wp_estate_sidebar_widget_color', '') );
+        $sidebar_heading_boxed_color                = esc_html ( wpresidence_get_option('wp_estate_sidebar_heading_boxed_color','') );
+       
+            $widgett_area_classes= "#primary .widget-container,#primary .agent_contanct_form,#primary .widget-container.latest_listings .widget-title-sidebar";   
         
             if ( $sidebarwidget_internal_padding_top!='' ){
                 $style.='
@@ -337,13 +487,12 @@ if( !function_exists('wpestate_general_design_elements') ):
                 $style.=$widgett_area_classes.'{
                     padding-top:'.$sidebarwidget_internal_padding_top.'px;
                 }
-                .agent_contanct_form_sidebar #show_contact,
-                .boxed_widget .widget-title-sidebar,
-                .widget-title-sidebar{
-                    margin-top:'.(-1 * $sidebarwidget_internal_padding_top).'px;
-                    margin-bottom:'.($sidebarwidget_internal_padding_top).'px;
-                }
                 
+                #primary .widget-container.latest_listings .widget-title-sidebar,
+                .directory_sidebar_wrapper{
+                    padding-top:'.$sidebarwidget_internal_padding_top.'px;
+                }
+
                 .widget-container.boxed_widget .wd_user_menu,
                 #primary .login_form, 
                 .widget-container.boxed_widget form{
@@ -356,28 +505,26 @@ if( !function_exists('wpestate_general_design_elements') ):
                 $style.=$widgett_area_classes.'{
                     padding-left:'.$sidebarwidget_internal_padding_left.'px;
                 }
-                .agent_contanct_form_sidebar #show_contact,
-                .boxed_widget .widget-title-sidebar,
-                .widget-title-sidebar{
+                #primary .latest_listings.list_type,
+                #primary .widget-container.latest_listings .widget-title-sidebar,
+                .directory_sidebar_wrapper{
                     padding-left:'.$sidebarwidget_internal_padding_left.'px;
-                    margin-left:'.(-1 * $sidebarwidget_internal_padding_left).'px;
                 }
-                .widget li, .widget-container li {
-                    border:none;
-                    margin-bottom: 5px;
-                    padding-bottom: 5px;
-                }
+
                 ';
-            }
-        
+            } 
         
             if ( $sidebarwidget_internal_padding_bottom!='' ){
                 $style.=$widgett_area_classes.'{
                     padding-bottom:'.$sidebarwidget_internal_padding_bottom.'px;
-                }';
+                }
+                #primary .latest_listings.list_type,
+                .directory_sidebar_wrapper{
+                    padding-bottom:'.$sidebarwidget_internal_padding_bottom.'px;
+                }
+                
+                ';
             }
-        
-        
         
             if ( $sidebarwidget_internal_padding_right!='' ){
                 $style.=$widgett_area_classes.'{
@@ -386,11 +533,14 @@ if( !function_exists('wpestate_general_design_elements') ):
                 #input_formula{
                     padding:0px;
                 }
-                 .agent_contanct_form_sidebar #show_contact,
-                .boxed_widget .widget-title-sidebar,
-                .widget-title-sidebar{
-                    margin-right:'.(-1 * $sidebarwidget_internal_padding_right).'px;
+                primary .latest_listings.list_type,
+                #primary .widget-container.latest_listings .widget-title-sidebar,
+                .directory_sidebar_wrapper{
+                    padding-right:'.$sidebarwidget_internal_padding_right.'px;
                 }
+                #adv_extended_close_widget{
+                    right: '.$sidebarwidget_internal_padding_right.'px;
+                }       
                
                 ';
             }
@@ -402,12 +552,20 @@ if( !function_exists('wpestate_general_design_elements') ):
             if ( $widget_sidebar_border_color!='' ){
                 $style.=$widgett_area_classes.'
                      {
-                    border-color:#'.$widget_sidebar_border_color.';
+                    border-color:'.$widget_sidebar_border_color.';
                     border-style: solid;
                 }
-                .advanced_search_sidebar .widget-title-footer, .advanced_search_sidebar .widget-title-sidebar{
-                    border-color:#'.$widget_sidebar_border_color.';
+                .advanced_search_sidebar .widget-title-footer, .advanced_search_sidebar .widget-title-sidebar,
+                #primary .latest_listings,
+                .directory_sidebar_wrapper {
+                    border-color:'.$widget_sidebar_border_color.'!important;
                     border-style: solid;
+                }
+                #primary .widget-container.latest_listings .widget-title-sidebar{
+                    border-bottom:0px!important;
+                }
+                #primary .latest_listings{
+                    border-top:0px!important;
                 }
                 ';
             }
@@ -417,25 +575,80 @@ if( !function_exists('wpestate_general_design_elements') ):
                     {
                     border-width:'.$wp_estate_widget_sidebar_border_size.'px;
                 }
+                #primary .latest_listings,
+                .directory_sidebar_wrapper {
+                    border-width:'.$wp_estate_widget_sidebar_border_size.'px!important;
+                }
                 ';
             }
-            
              
             if($sidebar_heading_background_color!=''){
                 $style.='
                     .widget-title-sidebar,.boxed_widget .widget-title-sidebar,
+                    .agent_contanct_form_sidebar #show_contact,
+                    #primary .widget-container.latest_listings .widget-title-sidebar{
+                        background-color:'.$sidebar_heading_background_color.'!important;
+                        
+                    }';
+                if($sidebarwidget_internal_padding_right!= '' && $sidebarwidget_internal_padding_top!='' && $sidebarwidget_internal_padding_bottom!='' && $sidebarwidget_internal_padding_left!=''  ){
+                    $style.='
+                    .widget-title-sidebar, .boxed_widget .widget-title-sidebar,
                     .agent_contanct_form_sidebar #show_contact{
-                        background-color:#'.$sidebar_heading_background_color.';
-                        border:none;
+                        margin-top: '.(-1 * $sidebarwidget_internal_padding_top).'px;
+                        margin-right: '.(-1 * $sidebarwidget_internal_padding_right).'px;
+                        margin-bottom: '.$sidebarwidget_internal_padding_bottom.'px;
+                        margin-left: '.(-1 * $sidebarwidget_internal_padding_left).'px;
                     }
-                ';
+                     .widget-title-sidebar, .boxed_widget .widget-title-sidebar,
+                     .agent_contanct_form_sidebar #show_contact{
+                        padding-top: '.$sidebarwidget_internal_padding_top.'px;
+                        padding-right: '.$sidebarwidget_internal_padding_right.'px;
+                        padding-bottom: '.$sidebarwidget_internal_padding_bottom.'px;
+                        padding-left: '.$sidebarwidget_internal_padding_left.'px;
+                    }
+                     #primary .widget-container.latest_listings .widget-title-sidebar{
+                        margin:0px;
+                  
+                    }
+                    #primary .latest_listings.list_type {
+                        padding-top: '.$sidebarwidget_internal_padding_top.'px;
+                    }';                    
+           
+            }else{
+                 $style.='
+                    .widget-title-sidebar, .boxed_widget .widget-title-sidebar,
+                    .agent_contanct_form_sidebar #show_contact{
+                        margin-top: -30px;
+                        margin-right: -30px;
+                        margin-bottom: 30px;
+                        margin-left: -30px;
+                    }
+                     .widget-title-sidebar, .boxed_widget .widget-title-sidebar,
+                     .agent_contanct_form_sidebar #show_contact{
+                        padding-top: 15px;
+                        padding-right: 30px;
+                        padding-bottom: 15px;
+                        padding-left: 30px;
+                    }
+                     #primary .widget-container.latest_listings .widget-title-sidebar{
+                        margin:0px;
+                        padding-top: 15px;
+                    }
+                    #primary .latest_listings.list_type {
+                        padding-top: 30px;
+                    }';
+                               
+            }
             }
             //widget-container
             if ($sidebar_widget_color != '') {
             $style.='
                 #primary .agent_contanct_form,
-                #primary .widget-container {
-                    background-color: #'.$sidebar_widget_color.';
+                #primary .widget-container,
+                #primary .widget-container.latest_listings .widget-title-sidebar,
+                #primary .latest_listings.list_type,
+                .directory_sidebar_wrapper{
+                    background-color: '.$sidebar_widget_color.';
                 }';
             } 
             
@@ -443,209 +656,40 @@ if( !function_exists('wpestate_general_design_elements') ):
                 $style.= '.boxed_widget .widget-title-sidebar,
                     .widget-title-sidebar,
                     .agent_contanct_form_sidebar #show_contact{
-                    color: #'.$sidebar_heading_boxed_color.';
+                    color: '.$sidebar_heading_boxed_color.';
                 }';
             }
-  
 
-            $sidebar_boxed_font_color            =  esc_html ( get_option('wp_estate_sidebar_boxed_font_color','') );
+            $sidebar_boxed_font_color            =  esc_html ( wpresidence_get_option('wp_estate_sidebar_boxed_font_color','') );
             if ($sidebar_boxed_font_color != '') {
                 $style.= '
                 #primary,#primary a,#primary label,
-                .advanced_search_sidebar .form-control::-webkit-input-placeholder ,
                 #primary .boxed_widget,#primary .boxed_widget a,#primary  .boxed_widget label,
-                .boxed_widget .advanced_search_sidebar .form-control::-webkit-input-placeholder {
-                    color: #'.$sidebar_boxed_font_color.';
+                #primary .agent_unit .agent_detail,
+                #primary .agent_unit .agent_detail i,
+                .directory_sidebar label{
+                    color: '.$sidebar_boxed_font_color.';
                 }'; 
             } 
             
-            
-        ////////////////////////////////////////// end same style widgelts  
-        }else{
-      
-            $widgett_area_classes= "#primary .widget-container.boxed_widget,#primary .agent_contanct_form";   
-            if ( $sidebarwidget_internal_padding_top!='' ){
-                $style.='
-                .agent_contanct_form_sidebar #show_contact{
-                    margin: 0px 0px 10px 0px;
-                    padding: 7px 0px 7px 0px;
-                    font-size: 16px;
-                    line-height: 26px;
-                    width:auto;
-                }';
-                 
-                  
-                $style.=$widgett_area_classes.'{
-                    padding-top:'.$sidebarwidget_internal_padding_top.'px;
-                }
-                .agent_contanct_form_sidebar #show_contact,
-                .boxed_widget .widget-title-sidebar{
-                    margin-top:'.(-1 * $sidebarwidget_internal_padding_top).'px;
-                    margin-bottom:'.( $sidebarwidget_internal_padding_top).'px;
-                }
-                .widget-container.boxed_widget .wd_user_menu, 
-                .widget-container.boxed_widget form{
-                    padding: 0px 0px 13px 0px;
-                }';
-            }
-        
-        
-            if ( $sidebarwidget_internal_padding_left!='' ){
-                $style.=$widgett_area_classes.'{
-                    padding-left:'.$sidebarwidget_internal_padding_left.'px;
-                }
-                .agent_contanct_form_sidebar #show_contact,
-                .boxed_widget .widget-title-sidebar{
-                    padding-left:'.$sidebarwidget_internal_padding_left.'px;
-                    margin-left:'.(-1 * $sidebarwidget_internal_padding_left).'px;
-                }
-                .widget-container.boxed_widget .wd_user_menu,
-                #primary .login_form,
-                .widget-container.boxed_widget form{
-                    padding: 0px 0px 0px 0px;
-                }
-                .widget li, .widget-container li {
-                    border:none;
-                    margin-bottom: 5px;
-                    padding-bottom: 5px;
-                }
-';
-                
-            }
-        
-        
-            if ( $sidebarwidget_internal_padding_bottom!='' ){
-                $style.=$widgett_area_classes.'{
-                    padding-bottom:'.$sidebarwidget_internal_padding_bottom.'px;
-                }';
-            }
-        
-        
-        
-            if ( $sidebarwidget_internal_padding_right!='' ){
-                $style.=$widgett_area_classes.'{
-                    padding-right:'.$sidebarwidget_internal_padding_right.'px;
-                }
-                #input_formula{
-                    padding:0px;
-                }
-                .agent_contanct_form_sidebar #show_contact,
-                .boxed_widget .widget-title-sidebar{
-                    margin-right:'.(-1 * $sidebarwidget_internal_padding_right).'px;
-                }';
-            }
-        
-            if ( $widget_sidebar_border_color!='' ){
-                $style.=$widgett_area_classes.'
-                    {
-                    border-color:#'.$widget_sidebar_border_color.';
-                    border-style: solid;
-                }
-                .advanced_search_sidebar .widget-title-footer, 
-                .advanced_search_sidebar .widget-title-sidebar{
-                    border-color:#'.$widget_sidebar_border_color.';
-                    border-style: solid;
-                }
-                ';
-            }
-            
-            if ( $wp_estate_widget_sidebar_border_size!='' ){
-                $style.=$widgett_area_classes.'{
-                    border-width:'.$wp_estate_widget_sidebar_border_size.'px;
-                }
-                ';
-            }
-            
-            if($sidebar_heading_background_color!=''){
-                $style.='
-                    .boxed_widget .widget-title-sidebar,
-                    .agent_contanct_form_sidebar #show_contact{
-                        background-color:#'.$sidebar_heading_background_color.';
-                        border:none;
-                    }
-                ';
-            }
-            if ($sidebar_widget_color != '') {
-            $style.='
-                #primary .agent_contanct_form,
-                #primary .widget-container.boxed_widget {
-                    background-color: #'.$sidebar_widget_color.';
-                }';
-            } 
-            
-            if($sidebar_heading_boxed_color!=''){
-                $style.= '.boxed_widget .widget-title-sidebar,.agent_contanct_form_sidebar #show_contact{
-                    color: #'.$sidebar_heading_boxed_color.';
-                }';
-            }
-            
-            if($sidebar_heading_color!=''){
-                $style.= '
-                    .widget-title-sidebar{
-                    color: #'.$sidebar_heading_color.';
-                }';
-            }
-            
-            
-            
-            if ($sidebar2_font_color != '') {
-                $style.= '
-                #primary,#primary a,#primary label,
-                .advanced_search_sidebar .form-control::-webkit-input-placeholder {
-                    color: #'.$sidebar2_font_color.';
-                }'; 
-            } 
-
-            $sidebar_boxed_font_color            =  esc_html ( get_option('wp_estate_sidebar_boxed_font_color','') );
-            if ($sidebar2_font_color != '') {
-                $style.= '
-                #primary .boxed_widget,#primary .boxed_widget a,#primary .boxed_widget label,
-                .boxed_widget .advanced_search_sidebar .form-control::-webkit-input-placeholder {
-                    color: #'.$sidebar_boxed_font_color.';
-                }'; 
-            } 
-        }
-        
-        ////////////////////////////////////////// end same style widgelts  
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-      
-
-
-
-     
-      
-        
-       
-        
-        
         
         if($map_controls_back!=''){
             $style.='#gmap-control span.spanselected,#gmap-control span,#gmap-control,
-                #gmapzoomplus_sh, #gmapzoomplus,#gmapzoomminus_sh, #gmapzoomminus,#openmap,#slider_enable_street_sh,#street-view{
-                background-color:#'.$map_controls_back.';
+                #gmapzoomplus, #gmapzoomminus,#openmap,#street-view{
+                background-color:'.$map_controls_back.';
             }';
         }
-        
-     
-  
+
         if($map_controls_font_color!=''){
-            $style.='#gmap-control span.spanselected, #gmap-control span:hover,#gmap-control span,
-                #gmap-control,#gmapzoomplus_sh, #gmapzoomplus,#gmapzoomminus_sh, #gmapzoomminus,#openmap,#slider_enable_street_sh,#street-view{
-                color:#'.$map_controls_font_color.';
-            }';
+            $style.='#gmap-control span.spanselected,#gmap-control span,
+                #gmap-control,#gmapzoomplus, #gmapzoomminus,#openmap,#street-view{
+                color:'.$map_controls_font_color.';
+            }
+            #gmap-control span:hover,
+            #street-view:hover{
+                color: #fff;
+            }
+            ';
         }
         
         if ( $unit_border_color!='' ){
@@ -654,9 +698,11 @@ if( !function_exists('wpestate_general_design_elements') ):
                 .property_listing:hover,
                 .featured_property,
                 .featured_article,
-                .agent_unit
+                .agent_unit,
+                .user_role_unit,
+                .agency_unit
                 {
-                border-color:#'.$unit_border_color.'
+                border-color:'.$unit_border_color.'
             }
             ';
         }
@@ -666,14 +712,17 @@ if( !function_exists('wpestate_general_design_elements') ):
                 .property_listing:hover,
                 .featured_property,
                 .featured_article,
-                .agent_unit
+                .agent_unit,
+                .user_role_unit,
+                .agency_unit,
+                .user_role_unit,
+                .agency_unit:hover
                 {
                 border-width:'.$unit_border_size.'px;
             }
             ';
         }
-        
-        
+
         
         if($blog_unit_min_height!=''){
             $style.='.blog2v .property_listing{
@@ -694,7 +743,7 @@ if( !function_exists('wpestate_general_design_elements') ):
             .agent_contanct_form,
             .page_template_loader .vc_row,
             #tab_prpg .tab-pane,
-            .single-agent,
+            .agency_content_wrapper,
             .single-blog,
             .single_width_blog #comments,
             .contact-wrapper,
@@ -702,15 +751,14 @@ if( !function_exists('wpestate_general_design_elements') ):
             .invoice_unit:nth-of-type(odd)
             ';
         
-        $content_area_classes='.notice_area,
-            .wpestate_property_description,
+        $content_area_classes='.wpestate_property_description,
             .property-panel .panel-body,
             .property-panel .panel-heading,
             .wpestate_agent_details_wrapper,
             .agent_contanct_form,
             .page_template_loader .vc_row,
             #tab_prpg .tab-pane,
-            .single-agent,
+            .agency_content_wrapper,
             .single-blog,
             .single_width_blog #comments,
             .contact-wrapper,
@@ -720,7 +768,17 @@ if( !function_exists('wpestate_general_design_elements') ):
         
         if($wp_estate_content_area_back_color!=''){
             $style.=$content_area_classes_color.'{
-                background-color:#'.$wp_estate_content_area_back_color.'   
+                background-color:'.$wp_estate_content_area_back_color.';  
+            }
+            
+            .property-panel .panel-heading,
+            .single-estate_property .listing-content .agent_contanct_form,
+            .property_reviews_wrapper,
+            .multi_units_wrapper,
+            .single-estate_agent .agent_content,
+            .agency_contact_wrapper,
+            .developer_contact_wrapper{
+                background-color:'.$wp_estate_content_area_back_color.'; 
             }
             .wpestate_property_description p{
                 margin-bottom:0px;
@@ -741,13 +799,7 @@ if( !function_exists('wpestate_general_design_elements') ):
             .single-agent .wpestate_agent_details_wrapper{
                 padding:0px;
             }
-            .single-agent {
-                padding: 0px 15px 0px 0px;
-                margin-bottom: 0px;
-                margin-left: 13px;
-                margin-right: 13px;
-                width: auto;
-            }
+         
             .contact_page_company_picture,
             .agentpic-wrapper{
                 padding-left:0px;
@@ -760,7 +812,9 @@ if( !function_exists('wpestate_general_design_elements') ):
             .contact_page_company_details{
                 padding-right:0px;
             }
-            
+            .lightbox_property_sidebar .agent_contanct_form{
+                background-color: #fff;
+            }
 
             ';
         }
@@ -769,13 +823,40 @@ if( !function_exists('wpestate_general_design_elements') ):
         if ( $wp_estate_contentarea_internal_padding_top!='' ){
             $style.=$content_area_classes.'{
                 padding-top:'.$wp_estate_contentarea_internal_padding_top.'px;
-            }';
+            }
+            .single-estate_property .listing-content .agent_contanct_form, 
+            .property_reviews_wrapper,
+            .multi_units_wrapper,
+            .developer_contact_wrapper,
+            .single-estate_agent .wpestate_agent_details_wrapper{
+                padding-top:'.$wp_estate_contentarea_internal_padding_top.'px;
+            }
+            .property-panel .panel-body,
+            .developer_contact_wrapper .col-md-6,
+            .single-estate_developer .agent_contanct_form,
+            .single-estate_agent .agent_content{
+                padding-top:0px;
+            }
+            ';
         }
         
         
         if ( $wp_estate_contentarea_internal_padding_left!='' ){
             $style.=$content_area_classes.'{
                 padding-left:'.$wp_estate_contentarea_internal_padding_left.'px;
+            }
+            .single-estate_property .listing-content .agent_contanct_form, 
+            .property_reviews_wrapper,
+            .multi_units_wrapper,
+            .notice_area,
+             .developer_contact_wrapper,
+             .single-estate_agent .wpestate_agent_details_wrapper,
+             .single-estate_agent .agent_content{
+                padding-left:'.$wp_estate_contentarea_internal_padding_left.'px;            
+            }
+            .developer_contact_wrapper .col-md-6,
+            .single-estate_developer .agent_contanct_form{
+                padding-left:0px;
             }
             ';
         }
@@ -784,51 +865,65 @@ if( !function_exists('wpestate_general_design_elements') ):
         if ( $wp_estate_contentarea_internal_padding_bottom!='' ){
             $style.=$content_area_classes.'{
                 padding-bottom:'.$wp_estate_contentarea_internal_padding_bottom.'px;
-            }';
+            }
+            .single-estate_property .listing-content .agent_contanct_form, 
+            .property_reviews_wrapper,
+            .multi_units_wrapper,
+             .developer_contact_wrapper,
+             .single-estate_agent .wpestate_agent_details_wrapper,
+             .single-estate_agent .agent_content{
+                padding-bottom:'.$wp_estate_contentarea_internal_padding_bottom.'px;
+            }
+            .property-panel .panel-heading,
+            .developer_contact_wrapper .col-md-6,
+            .single-estate_developer .agent_contanct_form{
+                padding-bottom: 0px;
+            }
+            .property_reviews_wrapper .wpresidence_button {
+                margin-bottom: 0px;
+            }
+            ';
         }
-        
-        
         
         if ( $wp_estate_contentarea_internal_padding_right!='' ){
             $style.=$content_area_classes.'{
                 padding-right:'.$wp_estate_contentarea_internal_padding_right.'px;
             }
+            .single-estate_property .listing-content .agent_contanct_form, 
+            .property_reviews_wrapper,
+            .multi_units_wrapper,
+            .notice_area,
+            .developer_contact_wrapper,
+            .single-estate_agent .wpestate_agent_details_wrapper,
+            .single-estate_agent .agent_content{
+                padding-right:'.$wp_estate_contentarea_internal_padding_right.'px;
+            }
             .property-panel h4:after{
                 margin-right:0px;
             }
-            .property_categs{
-                margin-top:0px;
+            .developer_contact_wrapper .col-md-6{
+               padding-right:0px;
             }
-            
+            .single-estate_developer .agent_contanct_form{
+                padding-right:20px;
+            }
+
             #add_favorites,
             .prop_social{
                 right:'.$wp_estate_contentarea_internal_padding_right.'px;
             }
             ';
         }
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-    
+
         if ( $property_unit_color!='' ){
             $style.='.property_listing,
                 .property_listing:hover,
                 .featured_property,
                 .featured_article,
-                .agent_unit
-                {
-                background-color:#'.$property_unit_color.'
+                .agent_unit,
+                .user_role_unit,
+                .agency_unit{
+                    background-color:'.$property_unit_color.'
             }
             ';
         }
@@ -871,25 +966,22 @@ if( !function_exists('wpestate_general_design_elements') ):
                 padding-right:'.$propertyunit_internal_padding_right.'px;
             }';
         }
-        
-        
-        
-        
          
         if($border_bottom_header_color!=''){
             $style.='.master_header{
-                border-color:#'.$border_bottom_header_color.';
+                border-color:'.$border_bottom_header_color.';
             }';
         } 
         if($border_bottom_header_sticky_color!=''){
             $style.='.master_header.master_header_sticky{
-                border-color:#'.$border_bottom_header_sticky_color.';
+                border-color:'.$border_bottom_header_sticky_color.';
             }';
         }
         
         if($border_bottom_header!=''){
             $style.='.master_header{
                border-width:'.$border_bottom_header.'px;
+                border-bottom-style:solid;
             }';
         }
         
@@ -967,8 +1059,6 @@ if( !function_exists('wpestate_general_design_elements') ):
             .contactformwrapper,
             .info_details,
             .info_idx,
-            .pack_description,
-            .submit_container,
             .loginwd_sidebar,
             blockquote,
             .featured_article,
@@ -983,15 +1073,34 @@ if( !function_exists('wpestate_general_design_elements') ):
             .wpb_call_to_action.wpestate_cta_button,
             .vc_call_to_action.wpestate_cta_button2,
             .saved_search_wrapper,
-            .search_unit_wrapper,.mortgage_calculator_li{
+            .search_unit_wrapper,.mortgage_calculator_li,
+            .adv_listing_filters_head, .listing_filters_head, .listing_filters,
+            .adv-search-3, .page-template-front_property_submit .navigation_container, 
+            .advanced_search_shortcode, 
+            .membership_package_product, .contact-wrapper, .developer_contact_wrapper, 
+            .agency_contact_wrapper, 
+            .property_reviews_wrapper, .agency_contact_container_wrapper, 
+            .agency_content_wrapper, .submit_property_front_wrapper, 
+            .directory_sidebar_wrapper, .places_wrapper_type_2, 
+            .featured_property, .agency_unit, #comments, 
+            .single-blog, #content_container .container_agent, 
+            .listing_wrapper .property_listing, 
+            .listing_wrapper .agent_unit, .tab-pane, 
+            .agent_contanct_form, .agent_content, 
+            .wpestate_agent_details_wrapper, 
+            .wpestate_property_description, 
+            .multi_units_wrapper, .property-panel, 
+            #primary .widget-container, .user_role_unit, 
+            .testimonial-slider-container .testimonial-container.type_class_3, 
+            .estate_places_slider.slick-initialized.slick-slider, 
+            .google_map_shortcode_wrapper, 
+            .testimonial-container.type_class_1 .testimonial-text, 
+            .blog_unit, .agent_unit_featured, 
+            .featured_article,
+            .slider_container .listing_wrapper .property_listing{
               '.$cssbox_shadow_value.'
             }
-            
-            .wpresidence_button{
-                border:none!important;
-                padding:14px 26px;
-            }
-
+           
 
             .agent_contanct_form input[type="submit"], 
             .single-content input[type="submit"]{
@@ -1007,9 +1116,9 @@ if( !function_exists('wpestate_general_design_elements') ):
             #googleloginsidebar_topbar, 
             #googleloginsidebar,
             #yahoologin, 
-            #yahoologinsidebar_mobile, 
-            #yahoologinsidebar_topbar, 
-            #yahoologinsidebar{
+            #twitterloginsidebar_mobile, 
+            #twitterloginsidebar_topbar, 
+            #twitterloginsidebar{
                 border-bottom:0px;
             }
 
@@ -1025,6 +1134,33 @@ if( !function_exists('wpestate_general_design_elements') ):
         
         if($border_radius_corner!=''){
             $style.='
+            #advanced_submit_2,
+            .adv_handler, 
+            #search_wrapper, 
+            #search_wrapper_color, 
+            .blog_unit_image, 
+            .comment-form #submit, 
+            .wpresidence_button, 
+            .adv_search_tab_item, 
+            #search_wrapper, 
+            .property_unit_type5 .item, 
+            .property_unit_type5 .featured_gradient, 
+            .property_unit_type5, 
+            .adv_search_tab_item, 
+            .property_reviews_wrapper, 
+            .listing_wrapper, 
+            .term_bar_item, .agentpict, 
+            .schedule_meeting, 
+            .form-control, 
+            .subunit_wrapper, 
+            .related_blog_unit_image img, 
+            .widget_latest_listing_image img, 
+            .agent-unit-img-wrapper img, 
+            .featured_widget_image img, 
+            .front_plan_row, 
+            .acc_google_maps, 
+            .wpresidence_button, 
+            .sidebar_filter_menu,    
             .places_wrapper_type_2,
             .places_wrapper_type_2 .places_cover,
             .mortgage_calculator_li,
@@ -1111,7 +1247,6 @@ if( !function_exists('wpestate_general_design_elements') ):
             #profile-image,
             .dasboard-prop-listing,
             .info-container i,
-            .submit_container,
             #form_submit_1,
             .loginwd_sidebar,
             .login_form,
@@ -1169,13 +1304,70 @@ if( !function_exists('wpestate_general_design_elements') ):
             #googleloginsidebar_topbar, 
             #googleloginsidebar,
             #yahoologin, 
-            #yahoologinsidebar_mobile, 
-            #yahoologinsidebar_topbar, 
-            #yahoologinsidebar,
+            #twitterloginsidebar_mobile, 
+            #twitterloginsidebar_topbar, 
+            #twitterloginsidebar,
             #new_post select,
             button.slick-prev.slick-arrow,
             button.slick-next.slick-arrow,
-            #pick_pack{
+            #pick_pack,
+            .single-estate_property .listing-content .agent_contanct_form,
+            .property_reviews_wrapper,
+            .notice_area,
+            .multi_units_wrapper,
+            .subunit_wrapper,
+            .subunit_thumb img,
+            .single-content.single-agent,
+            .container_agent .agent_contanct_form,
+            .agency_contact_wrapper,
+            .single-estate_agency .property_reviews_wrapper,
+            .agency_content_wrapper,
+            .developer_contact_wrapper,
+            .agency_contact_wrapper,
+            .single-content.single-blog,
+            .single_width_blog #comments,
+             #primary .widget-container,
+             .widget_latest_listing_image,
+             .directory_sidebar_wrapper,
+             .full_width_header .header_type1.header_left #access ul li.with-megamenu>ul.sub-menu, 
+             .full_width_header .header_type1.header_left #access ul li.with-megamenu:hover>ul.sub-menu,
+             .action_tag_wrapper,
+             .ribbon-inside,
+             .unit_type3_details,
+             .submit_listing,
+             .submit_action,
+             .agency_unit,
+             .modal_login_container,
+             .page_template_loader .vc_row,
+             .listing_wrapper .property_listing,
+             .adv-search-3, .page-template-front_property_submit .navigation_container, .advanced_search_shortcode, 
+             .membership_package_product, .contact-wrapper, .developer_contact_wrapper, 
+             .agency_contact_wrapper, .property_reviews_wrapper, 
+             .agency_contact_container_wrapper, 
+             .agency_content_wrapper, 
+             .submit_property_front_wrapper, 
+             .directory_sidebar_wrapper, 
+             .places_wrapper_type_2, 
+             .featured_property, 
+             .agency_unit, #comments, 
+             .single-blog, 
+             #content_container .container_agent, 
+             .listing_wrapper .property_listing, 
+             .listing_wrapper .agent_unit, 
+             .tab-pane, .agent_contanct_form, 
+             .agent_content, 
+             .wpestate_agent_details_wrapper, 
+             .wpestate_property_description, 
+             .multi_units_wrapper, .property-panel, 
+             #primary .widget-container, 
+             .user_role_unit, 
+             .testimonial-slider-container .testimonial-container.type_class_3, 
+             .estate_places_slider.slick-initialized.slick-slider, 
+             .google_map_shortcode_wrapper, 
+             .testimonial-container.type_class_1 .testimonial-text, 
+             .blog_unit, 
+             .agent_unit_featured, 
+             .featured_article{
                 border-radius: '.intval($border_radius_corner).'px;
             }
             
@@ -1204,7 +1396,8 @@ if( !function_exists('wpestate_general_design_elements') ):
             #access ul li.with-megamenu>ul.sub-menu,
             #access ul li.with-megamenu:hover>ul.sub-menu,
             .wpb_toggle.wpestate_toggle,
-            .featured_property img,
+            .featured_property.featured_property_type2 img,
+            .featured_property_type2 .places_cover,
             .info_details img,
              #adv-search-header-3,
             #adv-search-header-1,
@@ -1220,25 +1413,87 @@ if( !function_exists('wpestate_general_design_elements') ):
             .pagination .roundleft span,
             .slider-content,
             .property_listing img,
-            .agent_unit_social_single{
+            .agent_unit_social_single,
+            .wpestate_agent_details_wrapper,
+            .wpestate_property_description,
+            .single-estate_property .listing-content .agent_contanct_form,
+            .property_reviews_wrapper,
+            .schedule_meeting,
+            .agent_unit_button,
+            .control_tax_sh,
+            .adv_handler,
+            .featured_property.featured_property_type3{
                 border-top-left-radius: '.intval($border_radius_corner).'px;
                 border-top-right-radius: '.intval($border_radius_corner).'px;
                 border-bottom-left-radius: '.intval($border_radius_corner).'px;
                 border-bottom-right-radius: '.intval($border_radius_corner).'px;
             }
+            .featured_property.featured_property_type3 .featured_img,
+            .featured_property_type3 .item,
+            .single-estate_agency .agent_contanct_form{
+                border-top-left-radius: '.intval($border_radius_corner).'px;
+                border-bottom-left-radius: '.intval($border_radius_corner).'px;
+            }
+            .featured_property.featured_property_type3 .featured_secondline{
+                border-top-right-radius: '.intval($border_radius_corner).'px;
+                border-bottom-right-radius: '.intval($border_radius_corner).'px;
+            }
+
             .pack-unit h4,
-            .user_dashboard_links a:first-of-type{
+            .user_dashboard_links a:first-of-type,
+            .featured_property.featured_property_type1 .featured_img,
+            .featured_property.featured_property_type1 .carousel-inner,
+            #primary .widget-container.latest_listings .widget-title-sidebar,
+            .sub-menu li:hover:first-of-type,
+            #user_menu_open > li:first-of-type > a:hover,
+            #forgot-div-title-topbar, 
+            #register-div-title-topbar, 
+            #login-div-title-topbar{
+                border-top-left-radius: '.intval($border_radius_corner).'px;
+                border-top-right-radius: '.intval($border_radius_corner).'px;
+            }
+            .listing-unit-img-wrapper {
                 border-top-left-radius: '.intval($border_radius_corner).'px;
                 border-top-right-radius: '.intval($border_radius_corner).'px;
             }
 
-            .featured_secondline{
+
+            .featured_secondline,
+            .featured_property_type3 .item,
+            #primary .latest_listings,
+            #primary .latest_listings .owl-carousel .owl-wrapper-outer,
+            .sub-menu li:hover:last-of-type,
+            #user_menu_open > li:last-of-type > a:hover,
+            .login_modal_control{
                 border-bottom-left-radius: '.intval($border_radius_corner).'px;
                 border-bottom-right-radius: '.intval($border_radius_corner).'px;
             }
             #infocloser{
                 border-top-right-radius:0px;
             }
+            
+            .property-panel .panel-heading{
+                border-bottom-left-radius: 0px;
+                border-bottom-right-radius: 0px;
+            }
+            .property-panel .panel-body{
+                border-bottom-left-radius: '.intval($border_radius_corner).'px!important;
+                border-bottom-right-radius: '.intval($border_radius_corner).'px!important;
+            }
+            
+            .agency_unit,
+            .modal_login_container{
+                overflow: hidden;
+            }
+            
+            .listing_wrapper.col-md-12 .listing-unit-img-wrapper,
+            .listing_wrapper.col-md-12 > .property_listing .carousel-inner{
+                border-top-left-radius: '.intval($border_radius_corner).'px;
+                border-top-right-radius: 0px;
+                border-bottom-left-radius: '.intval($border_radius_corner).'px;
+                border-bottom-right-radius: 0px;            
+            }
+
             ';
         
         }
@@ -1252,12 +1507,14 @@ if( !function_exists('wpestate_general_design_elements') ):
             .wide .top_bar,
             .header_type2 .header_wrapper_inside,
             .header_type1 .header_wrapper_inside,
-            .slider-content-wrapper{
+            .slider-content-wrapper,
+            #colophon.boxed_footer, 
+            #colophon.sticky_footer.boxed_footer,
+            .main_wrapper.is_boxed #search_wrapper.with_search_form_float.sticky_adv{
                 width:'.$main_grid_content_width.'px;
             }
-            
+
             #footer-widget-area{
-                width:'.($main_grid_content_width).'px;
                 max-width:'.($main_grid_content_width).'px;
             }
              
@@ -1269,6 +1526,8 @@ if( !function_exists('wpestate_general_design_elements') ):
                 width:75%;
             }
             
+            .adv4-holder,
+            .main_wrapper.is_boxed #search_wrapper,
             .perpack, #direct_pay{
                 width: 100%;
             }
@@ -1276,14 +1535,29 @@ if( !function_exists('wpestate_general_design_elements') ):
               width:'.($main_grid_content_width-234-90).'px;
             }
             
-            .adv-search-1{
-                width:'.($main_grid_content_width-45).'px;
-              
+            .adv-search-1,
+            #search_wrapper.search_wr_10 .adv-search-1{
+                width:'.($main_grid_content_width-90).'px;
+                max-width:'.($main_grid_content_width-90).'px!important;
             }
+            
+            .main_wrapper.is_boxed  .adv-search-1{
+                width:'.($main_grid_content_width-20).'px;
+                max-width:'.($main_grid_content_width-20).'px!important;
+            }
+            
+            .main_wrapper.is_boxed #search_wrapper.with_search_form_float,
+            #search_wrapper.with_search_form_float{
+                width:'.($main_grid_content_width-90).'px;
+            }
+
             .transparent-wrapper{  
                 width:'.($main_grid_content_width-90).'px;
             }
-            .adv1-holder{
+            .adv1-holder,
+            .with_search_on_start.without_search_form_float .adv1-holder, 
+            .with_search_on_end.without_search_form_float .adv1-holder
+            {
                width:'.($main_grid_content_width-13-274).'px;
             }
             
@@ -1319,7 +1593,8 @@ if( !function_exists('wpestate_general_design_elements') ):
                 .wide .top_bar, 
                 .header_wrapper_inside, 
                 .slider-content-wrapper,
-                .wide .top_bar, .top_bar {
+                .wide .top_bar, .top_bar,
+                .adv-search-1{
                     width: 100%;
                     max-width:100%;
                 }
@@ -1332,9 +1607,15 @@ if( !function_exists('wpestate_general_design_elements') ):
             $sidebar_width = intval(100-$main_content_width);
             $style.='
             .col-md-9.rightmargin,
-            .single_width_blog,
+            .col-md-9.rightmargin.single_width_blog,
+            .col-md-9.col-md-push-3.rightmargin.single_width_blog,
             .full_width_prop{
                 width:'.$main_content_width.'%;
+            }
+            
+            .col-md-12.full_width_prop,
+            .col-md-12.single_width_blog{
+                width: 100%;
             }
             
             .col-md-push-3.rightmargin,
@@ -1398,26 +1679,58 @@ if( !function_exists('wpestate_general_design_elements') ):
             .admin-bar .has_header_type3 .header_media,
             .admin-bar .has_header_type4 .header_media,
             .admin-bar .has_header_type1 .header_media{
-                padding-top: '.($header_height-90+122).'px;
+                padding-top: '.($header_height-90+89).'px;
             }
             
+            .admin-bar .has_header_type4 .header_media,
+            .has_header_type4 .header_media{
+                padding-top: 0px;
+            }
+            .admin-bar.has_top_bar .has_header_type4 .header_media,
+            .has_top_bar .has_header_type4 .header_media{
+                padding-top: 40px;
+            }
+            
+
             .admin-bar.has_top_bar .has_header_type5 .header_media,
             .admin-bar.has_top_bar .has_header_type2 .header_media,
             .admin-bar.has_top_bar .has_header_type3 .header_media,
             .admin-bar.has_top_bar .has_header_type4 .header_media,
             .admin-bar.has_top_bar .has_header_type1 .header_media{
-                padding-top: '.($header_height-90+164).'px;
+                padding-top: '.($header_height-90+131).'px;
             }
             
+            .admin-bar.has_top_bar .has_header_type2 #google_map_prop_list_wrapper, 
+            .admin-bar.has_top_bar .has_header_type2 #google_map_prop_list_sidebar{
+                top: '.($header_height+73).'px;
+                margin-top: 0px;
+            }
+            
+            .has_top_bar .has_header_type2 #google_map_prop_list_wrapper, 
+            .has_top_bar .has_header_type2 #google_map_prop_list_sidebar{
+                top: '.($header_height+40).'px;
+                margin-top: 0px;
+            }
+
             #google_map_prop_list_sidebar,
             #google_map_prop_list_wrapper{
                 top: '.($header_height+41).'px;
             }
+            #google_map_prop_list_wrapper.half_no_top_bar.half_type3, 
+            #google_map_prop_list_sidebar.half_no_top_bar.half_type3,
+            #google_map_prop_list_wrapper.half_no_top_bar.half_type2, 
+            #google_map_prop_list_sidebar.half_no_top_bar.half_type2,
             #google_map_prop_list_wrapper.half_no_top_bar, 
             #google_map_prop_list_sidebar.half_no_top_bar{
                 top: '.($header_height).'px;
             }
             
+            .admin-bar.has_top_bar #google_map_prop_list_sidebar.half_type3,
+            .admin-bar.has_top_bar #google_map_prop_list_wrapper.half_type3{
+                top: '.($header_height+73).'px;
+                margin-top: 0px;
+            }
+
             .admin-bar #google_map_prop_list_sidebar.half_type3, 
             .admin-bar #google_map_prop_list_sidebar.half_type2, 
             .admin-bar #google_map_prop_list_wrapper.half_type2, 
@@ -1426,7 +1739,8 @@ if( !function_exists('wpestate_general_design_elements') ):
             #google_map_prop_list_sidebar.half_type3, 
             #google_map_prop_list_wrapper.half_type2, 
             #google_map_prop_list_wrapper.half_type3{
-            margin-top: 32px;
+                top: '.($header_height+33).'px;
+                margin-top: 0px;
             }
             
             .admin-bar.has_top_bar .has_header_type1 .dashboard-margin{    
@@ -1485,10 +1799,10 @@ if( !function_exists('wpestate_general_design_elements') ):
             ';
         }
          
-        $wpestate_uset_unit       =   intval ( get_option('wpestate_uset_unit','') );
-        $custom_unit_structure = get_option('wpestate_property_unit_structure');
-        if($wpestate_uset_unit==1 && $custom_unit_structure!=''){
-            foreach($custom_unit_structure as $rows){
+        $wpestate_uset_unit       =   intval ( wpresidence_get_option('wpestate_uset_unit','') );
+        $wpestate_custom_unit_structure = wpresidence_get_option('wpestate_property_unit_structure');
+        if($wpestate_uset_unit==1 && $wpestate_custom_unit_structure!=''){
+            foreach($wpestate_custom_unit_structure as $rows){
                 foreach($rows as $columns){
                     foreach($columns as $elements){
                         if($elements['class_name']!='' && $elements['class_content']!=''){
@@ -1508,8 +1822,7 @@ if( !function_exists('wpestate_general_design_elements') ):
         
         
         if($style!=''){
-            // echo "<style type='text/css'>".$style."</style>";  
-            echo $style;  
+            print trim($style);  
         }
 
     }
@@ -1517,10 +1830,13 @@ endif;
 
 
 if(!function_exists('wpestate_build_unit_custom_structure')):
-function wpestate_build_unit_custom_structure($custom_unit_structure,$propID,$property_unit_slider){
+function wpestate_build_unit_custom_structure($wpestate_custom_unit_structure,$propID,$wpestate_property_unit_slider){
    
     $row_no=0;
-    foreach($custom_unit_structure as $rows){
+    $wpestate_custom_unit_structure      =   wpresidence_get_option('wpestate_property_unit_structure');
+   
+    if(is_array($wpestate_custom_unit_structure)){
+        foreach($wpestate_custom_unit_structure as $rows){
        
         $row_class=count ($rows);
         $col_md=12;
@@ -1551,7 +1867,7 @@ function wpestate_build_unit_custom_structure($custom_unit_structure,$propID,$pr
                     }
                     
                     print '>';
-                    wpestate_build_unit_show_detail($elements['element_name'],$propID,$property_unit_slider,$elements['text'],$elements['icon']);
+                    wpestate_build_unit_show_detail($elements['element_name'],$propID,$wpestate_property_unit_slider,$elements['text'],$elements['icon']);
                     print '</div>';
                 }
             print'</div>';
@@ -1559,45 +1875,39 @@ function wpestate_build_unit_custom_structure($custom_unit_structure,$propID,$pr
         
         
     }
-            
+    } 
 }
 endif;
 
 
 if(!function_exists('wpestate_build_unit_show_detail')):
-function wpestate_build_unit_show_detail($element,$propID,$property_unit_slider,$text,$icon){
+function wpestate_build_unit_show_detail($element,$propID,$wpestate_property_unit_slider,$text,$icon){
     $element = strtolower($element);
     
     
     switch ($element) {
         case 'share':
-            $link=get_permalink($propID);
+            $link=  esc_url (  get_permalink($propID) );
             if ( has_post_thumbnail() ){
                 $pinterest = wp_get_attachment_image_src(get_post_thumbnail_id(), 'property_full_map');
             }
             $protocol = is_ssl() ? 'https' : 'http';
-            print '
-                <div class="share_unit">
-                <a href="'.$protocol.'://www.facebook.com/sharer.php?u='.esc_url($link).'&amp;t='.urlencode(get_the_title($propID)).'" target="_blank" class="social_facebook"></a>
-                <a href="'.$protocol.'://twitter.com/home?status='.urlencode(get_the_title($propID).' '.$link).'" class="social_tweet" target="_blank"></a>
-                <a href="'.$protocol.'://plus.google.com/share?url='.esc_url($link).'" onclick="javascript:window.open(this.href,\'\', \'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600\');return false;" target="_blank" class="social_google"></a> 
-                <a href="'.$protocol.'://pinterest.com/pin/create/button/?url='.esc_url($link).'&amp;media=';
-                    if (isset( $pinterest[0])){ echo esc_url($pinterest[0]); }
-                    print '&amp;description='.urlencode(get_the_title($propID)).'" target="_blank" class="social_pinterest"></a>
-                </div>';
+            
+            print wpestate_share_unit_desing($propID);
+            
             if($text==''){
                 if($icon!=''){
                     if ( strpos($icon, 'fa-') !== false){
-                        print '<span class="share_list text_share"  data-original-title="'.__('share','wpestate').'" ><i class="fa '.$icon.'" aria-hidden="true"></i></span>';
+                        print '<span class="share_list text_share"  data-original-title="'.esc_attr__('share','wpresidence').'" ><i class="fa '.esc_attr($icon).'" aria-hidden="true"></i></span>';
                     }else{
-                        print '<span class="share_list text_share"  data-original-title="'.__('share','wpestate').'" ><img src="'.$icon.'" alt="featured_icon"></span>';
+                        print '<span class="share_list text_share"  data-original-title="'.esc_attr__('share','wpresidence').'" ><img src="'.esc_url($icon).'" alt="'.esc_html__('share','wpresidence').'"></span>';
                     }
                 }else{
-                    print '<span class="share_list"  data-original-title="'.__('share','wpestate').'" ></span>';
+                    print '<span class="share_list"  data-original-title="'.esc_attr__('share','wpresidence').'" ></span>';
                 }
                 
             }else{
-               print '<span class="share_list text_share"  data-original-title="'.__('share','wpestate').'" >'.$text.'</span>';
+               print '<span class="share_list text_share"  data-original-title="'.esc_attr__('share','wpresidence').'" >'.$text.'</span>';
             }       
                
         break;
@@ -1605,15 +1915,15 @@ function wpestate_build_unit_show_detail($element,$propID,$property_unit_slider,
         
         case 'link_to_page':
          
-            $link=get_permalink($propID);        
+            $link=  esc_url ( get_permalink($propID));        
             if($text==''){
                 if ( strpos($icon, 'fa-') !== false){
-                    print '<a href="'.$link.'"><i class="fa '.$icon.'" aria-hidden="true"></i></a>';
+                    print '<a href="'.esc_url($link).'" target="'.esc_attr(wpresidence_get_option('wp_estate_unit_card_new_page','')).'" ><i class="fa '.esc_attr($icon).'" aria-hidden="true"></i></a>';
                 }else{
-                    print '<a href="'.$link.'"><img src="'.$icon.'" alt="details"></a>';
+                    print '<a href="'.esc_url($link).'" target="'.esc_attr(wpresidence_get_option('wp_estate_unit_card_new_page','')).'" ><img src="'.esc_url($icon).'" alt="'.esc_html__('details','wpresidence').'"></a>';
                 }
             }else{
-               print '<a href="'.$link.'">'.str_replace('_',' ',$text).'</a>';
+               print '<a href="'.esc_url($link).'" target="'.esc_attr(wpresidence_get_option('wp_estate_unit_card_new_page','')).'" >'.str_replace('_',' ',$text).'</a>';
                
             }       
                
@@ -1624,32 +1934,16 @@ function wpestate_build_unit_show_detail($element,$propID,$property_unit_slider,
             $userID         =   $current_user->ID;
             $user_option    =   'favorites'.$userID;
             $favorite_class =   'icon-fav-off';
-            $fav_mes        =   __('add to favorites','wpestate');
+            $fav_mes        =   esc_html__('add to favorites','wpresidence');
             $user_option    =   'favorites'.$userID;
             $curent_fav     =   get_option($user_option);
             if($curent_fav){
                 if ( in_array ($propID,$curent_fav) ){
                     $favorite_class =   'icon-fav-on';   
-                    $fav_mes        =   __('remove from favorites','wpestate');
+                    $fav_mes        =   esc_html__('remove from favorites','wpresidence');
                 } 
             }
-            // print '<span class="icon-fav '.esc_html($favorite_class).'" data-original-title="'.$fav_mes.'" data-postid="'.intval($propID).'"></span>';
-            /*
-            if($text==''){
-                if($icon!=''){
-                    if ( strpos($icon, 'fa-') !== false){
-                        print '<span class="icon-fav '.esc_html($favorite_class).'" data-original-title="'.$fav_mes.'" data-postid="'.intval($propID).'"><i class="fa '.$icon.'" aria-hidden="true"></i></span>';
-                    }else{
-                        print '<span class="icon-fav '.esc_html($favorite_class).'" data-original-title="'.$fav_mes.'" data-postid="'.intval($propID).'"><img src="'.$icon.'" alt="favorite icon"></span>';
-                    }
-                }else{
-                    print '<span class="icon-fav '.esc_html($favorite_class).'" data-original-title="'.$fav_mes.'" data-postid="'.intval($propID).'"></span>';
-                }
-            } else{
-                print '<span class="icon-fav favorite-text'.esc_html($favorite_class).'" data-original-title="'.$fav_mes.'" data-postid="'.intval($propID).'">'.$text.'</span>';
-            }
-            */
-            print '<span class="icon-fav custom_fav '.esc_html($favorite_class).'" data-original-title="'.$fav_mes.'" data-postid="'.intval($propID).'"></span>';
+        print '<span class="icon-fav custom_fav '.esc_attr($favorite_class).'" data-original-title="'.esc_attr($fav_mes).'" data-postid="'.intval($propID).'"></span>';
         
         break;
         
@@ -1662,24 +1956,24 @@ function wpestate_build_unit_show_detail($element,$propID,$property_unit_slider,
               
                 if($icon!=''){
                     if ( strpos($icon, 'fa-') !== false){
-                        print '<span class="compare-action text_compare" data-original-title="'.__('compare','wpestate').'" data-pimage="';
-                        if( isset($compare[0])){echo esc_html($compare[0]);} 
-                        print '" data-pid="'.intval($propID).'"><i class="fa '.$icon.'" aria-hidden="true"></i></span>';
+                        print '<span class="compare-action text_compare" data-original-title="'.esc_attr__('compare','wpresidence').'" data-pimage="';
+                        if( isset($compare[0])){print esc_html($compare[0]);} 
+                        print '" data-pid="'.intval($propID).'"><i class="fa '.esc_attr($icon).'" aria-hidden="true"></i></span>';
                        
                     }else{
-                        print '<span class="compare-action text_compare" data-original-title="'.__('compare','wpestate').'" data-pimage="';
-                        if( isset($compare[0])){echo esc_html($compare[0]);} 
-                        print '" data-pid="'.intval($propID).'"><img src="'.$icon.'" alt="featured_icon"></span>';
+                        print '<span class="compare-action text_compare" data-original-title="'.esc_attr__('compare','wpresidence').'" data-pimage="';
+                        if( isset($compare[0])){print esc_html($compare[0]);} 
+                        print '" data-pid="'.intval($propID).'"><img src="'.esc_url($icon).'" alt="'.esc_html__('featured icon','wpresidence').'"></span>';
                     }
                 }else{
-                    print '<span class="compare-action" data-original-title="'.__('compare','wpestate').'" data-pimage="';
-                    if( isset($compare[0])){echo esc_html($compare[0]);} 
+                    print '<span class="compare-action" data-original-title="'.esc_attr__('compare','wpresidence').'" data-pimage="';
+                    if( isset($compare[0])){print esc_html($compare[0]);} 
                     print '" data-pid="'.intval($propID).'"></span>';
                 }
                 
             }else{
-               print '<span class="compare-action text_compare" data-original-title="'.__('compare','wpestate').'" data-pimage="';
-               if( isset($compare[0])){echo esc_html($compare[0]);} 
+               print '<span class="compare-action text_compare" data-original-title="'.esc_attr__('compare','wpresidence').'" data-pimage="';
+               if( isset($compare[0])){print esc_html($compare[0]);} 
                print '" data-pid="'.intval($propID).'">'.$text.'</span>';
                
             }       
@@ -1688,13 +1982,14 @@ function wpestate_build_unit_show_detail($element,$propID,$property_unit_slider,
         
         
          case 'property_status':
-            $prop_stat              =   esc_html( get_post_meta($propID, 'property_status', true) );
-            if ($prop_stat != 'normal') {
-                $ribbon_class = str_replace(' ', '-', $prop_stat);
-                if (function_exists('icl_translate') ){
-                    $prop_stat     =   icl_translate('wpestate','wp_estate_property_status'.$prop_stat, $prop_stat );
+            $prop_stat              =    get_the_terms( $propID, 'property_status');
+             
+            if(is_array($prop_stat)){ 
+                foreach ($prop_stat as $key=>$term){
+                    if($term->slug!='normal'){
+                        print stripslashes($term->name) ;
+                    }
                 }
-                print stripslashes($prop_stat) ;
             }
         break;
         
@@ -1705,7 +2000,7 @@ function wpestate_build_unit_show_detail($element,$propID,$property_unit_slider,
             if ( strpos($icon, 'fa-') !== false){
                 print '<i class="fa '.$icon.'" aria-hidden="true"></i>';
             }else{
-                print '<img src="'.$icon.'" alt="featured_icon">';
+                print '<img src="'.esc_url($icon).'" alt="'.esc_html__('featured icon','wpresidence').'">';
             }
         break;
         
@@ -1715,12 +2010,12 @@ function wpestate_build_unit_show_detail($element,$propID,$property_unit_slider,
             if(intval  ( get_post_meta($propID, 'prop_featured', true) )==1){
                 
                 if($text!=''){
-                    print $text;
+                    print esc_html($text);
                 }else{
                     if ( strpos($icon, 'fa-') !== false){
                         print '<i class="fa '.$icon.'" aria-hidden="true"></i>';
                     }else{
-                        print '<img src="'.$icon.'" alt="featured_icon">';
+                        print '<img src="'.esc_url($icon).'" alt="'.esc_html__('featured icon','wpresidence').'">';
                     }
                 }
                 
@@ -1734,65 +2029,65 @@ function wpestate_build_unit_show_detail($element,$propID,$property_unit_slider,
             }else{
                 $meta_value =stripslashes(str_replace('_',' ',$text));
                 $meta_value = apply_filters( 'wpml_translate_single_string', $meta_value, 'wpestate', 'wp_estate_custom_unit_'.$meta_value );
-                echo $meta_value;
+                print esc_html($meta_value);
             }
         break;
         
         case 'image':
-            wpestate_build_unit_show_detail_image($propID,$property_unit_slider);
+            wpestate_build_unit_show_detail_image($propID,$wpestate_property_unit_slider);
         break;
     
         case 'description':
-            echo wpestate_strip_excerpt_by_char(get_the_excerpt(),115,$propID);
+            print wpestate_strip_excerpt_by_char(get_the_excerpt(),115,$propID);
         break;
     
         case 'title':
-            print '<h4><a href="'.get_permalink($propID).'">'.get_the_title($propID).'</a></h4>';
+            print '<h4><a href="'.esc_url( get_permalink($propID) ).'" target="'.esc_attr(wpresidence_get_option('wp_estate_unit_card_new_page','')).'" >'.get_the_title($propID).'</a></h4>';
         break;
     
         case 'property_price':
-            $currency                   =   esc_html( get_option('wp_estate_currency_symbol', '') );
-            $where_currency             =   esc_html( get_option('wp_estate_where_currency_symbol', '') );
-            wpestate_show_price($propID,$currency="",$where_currency);
+            $wpestate_currency                   =   esc_html( wpresidence_get_option('wp_estate_currency_symbol', '') );
+            $where_currency             =   esc_html( wpresidence_get_option('wp_estate_where_currency_symbol', '') );
+            wpestate_show_price($propID,$wpestate_currency,$where_currency);
         break;
     
         case 'property_category';
-            echo get_the_term_list($propID, 'property_category', '', ', ', '') ;
+            print get_the_term_list($propID, 'property_category', '', ', ', '') ;
         break;
     
         case 'property_action_category';
-            echo get_the_term_list($propID, 'property_action_category', '', ', ', '') ;
+            print get_the_term_list($propID, 'property_action_category', '', ', ', '') ;
         break;
         
         case 'property_city';
-            echo get_the_term_list($propID, 'property_city', '', ', ', '') ;
+            print get_the_term_list($propID, 'property_city', '', ', ', '') ;
         break;
         
         case 'property_area';
-            echo get_the_term_list($propID, 'property_area', '', ', ', '') ;
+            print get_the_term_list($propID, 'property_area', '', ', ', '') ;
         break;
         
         case 'property_county_state';
-            echo  get_the_term_list($propID, 'property_county_state', '', ', ', '') ;
+            print  get_the_term_list($propID, 'property_county_state', '', ', ', '') ;
         break;
         
         case 'property_agent';
             $agent_id   = intval( get_post_meta($propID, 'property_agent', true) );
-            echo '<a href="'.get_permalink($agent_id).'">'.get_the_title($agent_id).'</a>';
+            print '<a href="'.esc_url ( get_permalink($agent_id) ).'">'.get_the_title($agent_id).'</a>';
         break;
         
         case 'property_agent_picture';
             $agent_id   = intval( get_post_meta($propID, 'property_agent', true) );
             $preview            = wp_get_attachment_image_src(get_post_thumbnail_id($agent_id), 'agent_picture_thumb');
             $preview_img         = $preview[0];
-            echo '<a href="'.get_permalink($agent_id).'" class="property_unit_custom_agent_face" style="background-image:url('.$preview_img.')"></a>';
+            print '<a href="'.esc_url( get_permalink($agent_id)).'" class="property_unit_custom_agent_face" style="background-image:url('.esc_url($preview_img).')"></a>';
         break;
         
         case 'custom_div';
             print '';
         break;
         case 'property_size';
-            print wpestate_sizes_no_format ( floatval ( get_post_meta($propID, 'property_size', true) ) );
+            print wpestate_get_converted_measure( $propID, 'property_size' ); 
         break;
         default:
            
@@ -1801,7 +2096,7 @@ function wpestate_build_unit_show_detail($element,$propID,$property_unit_slider,
             }else{
                 $meta_value = get_post_meta($propID, $element, true);;
                 $meta_value = apply_filters( 'wpml_translate_single_string', $meta_value, 'wpestate', 'wp_estate_custom_unit_'.$meta_value );
-                echo $meta_value;
+                print esc_html($meta_value);
             }
     }
     
@@ -1809,20 +2104,12 @@ function wpestate_build_unit_show_detail($element,$propID,$property_unit_slider,
 }
 endif;
 
-// $prop_stat              =   esc_html( get_post_meta($post->ID, 'property_status', true) );
-
-
-
-
-
-
-
 
 if (!function_exists('wpestate_build_unit_show_detail_image')):
-function wpestate_build_unit_show_detail_image($propID,$property_unit_slider){
+function wpestate_build_unit_show_detail_image($propID,$wpestate_property_unit_slider){
     
     if ( has_post_thumbnail($propID) ){
-        $link       =   get_permalink($propID);
+        $link       =    esc_url ( get_permalink($propID));
         $title      =   get_the_title($propID);
         $pinterest  =   wp_get_attachment_image_src(get_post_thumbnail_id($propID), 'property_full_map');
         $preview    =   wp_get_attachment_image_src(get_post_thumbnail_id($propID), 'property_listings');
@@ -1836,13 +2123,13 @@ function wpestate_build_unit_show_detail_image($propID,$property_unit_slider){
         $thumb_prop             =   get_the_post_thumbnail($propID, 'property_listings',$extra);
 
         if($thumb_prop ==''){
-            $thumb_prop_default =  get_template_directory_uri().'/img/defaults/default_property_listings.jpg';
-            $thumb_prop         =  '<img src="'.$thumb_prop_default.'" class="b-lazy img-responsive wp-post-image  lazy-hidden" alt="no thumb" />';   
+            $thumb_prop_default =  get_theme_file_uri('/img/defaults/default_property_listings.jpg');
+            $thumb_prop         =  '<img src="'.esc_url($thumb_prop_default).'" class="b-lazy img-responsive wp-post-image  lazy-hidden" alt="'.esc_html__('icon','wpresidence').'" />';   
         }
 
         print   '<div class="listing-unit-img-wrapper">';
 
-            if(  $property_unit_slider==1){
+            if(  $wpestate_property_unit_slider==1){
                     //slider
                 $arguments      = array(
                                     'numberposts' => -1,
@@ -1864,16 +2151,16 @@ function wpestate_build_unit_show_detail_image($propID,$property_unit_slider){
                     $preview    =   wp_get_attachment_image_src($attachment->ID, 'property_listings');
 
                     $slides     .= '<div class="item lazy-load-item">
-                                        <a href="'.$link.'"><img  data-lazy-load-src="'.$preview[0].'" alt="'.$title.'" class="img-responsive" /></a>
+                                        <a href="'.esc_url($link).'"><img  data-lazy-load-src="'.esc_attr($preview[0]).'" alt="'.esc_attr($title).'" class="img-responsive" /></a>
                                     </div>';
 
                 }// end foreach
                 $unique_prop_id=uniqid();
                 print '
-                <div id="property_unit_carousel_'.$unique_prop_id.'" class="carousel property_unit_carousel slide " data-ride="carousel" data-interval="false">
+                <div id="property_unit_carousel_'.esc_attr($unique_prop_id).'" class="carousel property_unit_carousel slide " data-ride="carousel" data-interval="false">
                     <div class="carousel-inner">         
                         <div class="item active">    
-                            <a href="'.$link.'">'.$thumb_prop.'</a>     
+                            <a href="'.esc_url($link).'">'.$thumb_prop.'</a>     
                         </div>
                         '.$slides.'
                     </div>
@@ -1881,15 +2168,15 @@ function wpestate_build_unit_show_detail_image($propID,$property_unit_slider){
 
 
 
-                    <a href="'.$link.'"> </a>';
+                    <a href="'.esc_url($link).'"> </a>';
 
                     if( $no_slides>0){
                         print '<a class="left  carousel-control" href="#property_unit_carousel_'.$unique_prop_id.'" data-slide="prev">
-                            <i class="fa fa-angle-left"></i>
+                            <i class="fas fa-angle-left"></i>
                         </a>
 
                         <a class="right  carousel-control" href="#property_unit_carousel_'.$unique_prop_id.'" data-slide="next">
-                            <i class="fa fa-angle-right"></i>
+                            <i class="fas fa-angle-right"></i>
                         </a>';
                     }
                 print'
@@ -1897,8 +2184,8 @@ function wpestate_build_unit_show_detail_image($propID,$property_unit_slider){
 
 
             }else{
-                print   '<a href="'.$link.'">'.$thumb_prop.'</a>';
-                print   '<div class="listing-cover"></div><a href="'.$link.'"> <span class="listing-cover-plus">+</span></a>'; 
+                print   '<a href="'.esc_url($link).'">'.$thumb_prop.'</a>';
+                print   '<div class="listing-cover"></div><a href="'.esc_url($link).'"> <span class="listing-cover-plus">+</span></a>'; 
             }
 
 
@@ -1908,5 +2195,35 @@ function wpestate_build_unit_show_detail_image($propID,$property_unit_slider){
                 
 
             }
+}
+endif;
+
+
+if(!function_exists('wpestate_share_unit_desing')):
+function wpestate_share_unit_desing($prop_id,$is_single=1){
+    $protocol       =   is_ssl() ? 'https' : 'http';
+    $pinterest      =   wp_get_attachment_image_src(get_post_thumbnail_id($prop_id), 'property_full_map');
+    $link           =   esc_url ( get_permalink($prop_id) );
+    $title          =   get_the_title($prop_id);
+    $twiter_status  =   urlencode( $title.' '.$link);
+    $email_link     =   'subject='.urlencode ( $title ) .'&body='. urlencode( esc_url($link));
+    ob_start();
+    
+    ?>
+        <div class="share_unit">
+        <a href="<?php print esc_html($protocol);?>://www.facebook.com/sharer.php?u=<?php echo esc_url($link); ?>&amp;t=<?php echo urlencode(get_the_title()); ?>" target="_blank" class="social_facebook"></a>
+        <a href="<?php print esc_html($protocol);?>://twitter.com/intent/tweet?text=<?php echo esc_html($twiter_status); ?>" class="social_tweet" target="_blank"></a>
+        <a href="<?php print esc_html($protocol);?>://pinterest.com/pin/create/button/?url=<?php echo esc_url($link); ?>&amp;media=<?php if (isset( $pinterest[0])){ echo esc_url($pinterest[0]); }?>&amp;description=<?php echo urlencode(get_the_title()); ?>" target="_blank" class="social_pinterest"></a>
+        <a href="<?php print esc_html($protocol);?>://api.whatsapp.com/send?text=<?php echo urlencode( get_the_title().' '. esc_url( $link )); ?>" class="social_whatsup" target="_blank"></a>   
+           
+        <a href="mailto:email@email.com?<?php echo trim(esc_html($email_link));?>" data-action="share email"  class="social_email"></a>
+
+    </div>
+    <?php
+  
+    $return = ob_get_contents();
+    ob_end_clean();
+    return   $return ;    
+              
 }
 endif;

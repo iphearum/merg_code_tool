@@ -162,10 +162,10 @@ class Walker_Nav_Menu_Edit_Custom extends Walker_Nav_Menu  {
     
         if ( ! empty( $item->_invalid ) ) {
             $classes[] = 'menu-item-invalid';
-            $title = sprintf( __( '%s (Invalid)', "wpestate"), $item->title );
+            $title = sprintf( esc_html__( '%s (Invalid)', "wpresidence"), $item->title );
         } elseif ( isset( $item->post_status ) && 'draft' == $item->post_status ) {
             $classes[] = 'pending';
-            $title = sprintf( __('%s (Pending)', "wpestate"), $item->title );
+            $title = sprintf( esc_html__('%s (Pending)', "wpresidence"), $item->title );
         }
     
         $title = empty( $item->label ) ? $title : $item->label;
@@ -185,11 +185,11 @@ class Walker_Nav_Menu_Edit_Custom extends Walker_Nav_Menu  {
                                             'action' => 'move-up-menu-item',
                                             'menu-item' => $item_id,
                                         ),
-                                        remove_query_arg($removed_args, admin_url( 'nav-menus.php' ) )
+                                        remove_query_arg($removed_args, esc_url(admin_url( 'nav-menus.php' )) )
                                     ),
                                     'move-menu_item'
                                 );
-                            ?>" class="item-move-up"><abbr title="<?php esc_attr_e('Move up', "wpestate"); ?>">&#8593;</abbr></a>
+                            ?>" class="item-move-up"><abbr title="<?php esc_attr_e('Move up', "wpresidence"); ?>">&#8593;</abbr></a>
                             |
                             <a href="<?php
                                 echo wp_nonce_url(
@@ -198,15 +198,15 @@ class Walker_Nav_Menu_Edit_Custom extends Walker_Nav_Menu  {
                                             'action' => 'move-down-menu-item',
                                             'menu-item' => $item_id,
                                         ),
-                                        remove_query_arg($removed_args, admin_url( 'nav-menus.php' ) )
+                                        remove_query_arg($removed_args, esc_url(admin_url( 'nav-menus.php') ) )
                                     ),
                                     'move-menu_item'
                                 );
-                            ?>" class="item-move-down"><abbr title="<?php esc_attr_e('Move down',"wpestate"); ?>">&#8595;</abbr></a>
+                            ?>" class="item-move-down"><abbr title="<?php esc_attr_e('Move down',"wpresidence"); ?>">&#8595;</abbr></a>
                         </span>
-                        <a class="item-edit" id="edit-<?php echo esc_html($item_id); ?>" title="<?php esc_attr_e('Edit Menu Item', "wpestate"); ?>" href="<?php
-                            echo ( isset( $_GET['edit-menu-item'] ) && $item_id == $_GET['edit-menu-item'] ) ? admin_url( 'nav-menus.php' ) : add_query_arg( 'edit-menu-item', $item_id, remove_query_arg( $removed_args, admin_url( 'nav-menus.php#menu-item-settings-' . $item_id ) ) );
-                        ?>"><?php _e( 'Edit Menu Item', "wpestate"); ?></a>
+                        <a class="item-edit" id="edit-<?php echo esc_html($item_id); ?>" title="<?php esc_attr_e('Edit Menu Item', "wpresidence"); ?>" href="<?php
+                            echo ( isset( $_GET['edit-menu-item'] ) && $item_id == $_GET['edit-menu-item'] ) ? esc_url( admin_url( 'nav-menus.php' )) : add_query_arg( 'edit-menu-item', $item_id, remove_query_arg( $removed_args, esc_url( admin_url( 'nav-menus.php#menu-item-settings-' . $item_id )) ) );
+                        ?>"><?php esc_html_e( 'Edit Menu Item', "wpresidence"); ?></a>
                     </span>
                 </dt>
             </dl>
@@ -215,53 +215,53 @@ class Walker_Nav_Menu_Edit_Custom extends Walker_Nav_Menu  {
                 <?php if( 'custom' == $item->type ) : ?>
                     <p class="field-url description description-wide">
                         <label for="edit-menu-item-url-<?php echo esc_html($item_id); ?>">
-                            <?php _e( 'URL', "wpestate" ); ?><br />
+                            <?php esc_html_e( 'URL', "wpresidence" ); ?><br />
                             <input type="text" id="edit-menu-item-url-<?php echo esc_html($item_id); ?>" class="widefat code edit-menu-item-url" name="menu-item-url[<?php echo esc_html($item_id); ?>]" value="<?php echo esc_attr( $item->url ); ?>" />
                         </label>
                     </p>
                 <?php endif; ?>
                 <p class="description description-thin">
                     <label for="edit-menu-item-title-<?php echo esc_html($item_id); ?>">
-                        <?php _e( 'Navigation Label', "wpestate" ); ?><br />
+                        <?php esc_html_e( 'Navigation Label', "wpresidence" ); ?><br />
                         <input type="text" id="edit-menu-item-title-<?php echo esc_html($item_id); ?>" class="widefat edit-menu-item-title" name="menu-item-title[<?php echo esc_html($item_id); ?>]" value="<?php echo esc_attr( $item->title ); ?>" />
                     </label>
                 </p>
                 <p class="description description-thin">
                     <label for="edit-menu-item-attr-title-<?php echo esc_html($item_id); ?>">
-                        <?php _e( 'Title Attribute', "wpestate" ); ?><br />
+                        <?php esc_html_e( 'Title Attribute', "wpresidence" ); ?><br />
                         <input type="text" id="edit-menu-item-attr-title-<?php echo esc_html($item_id); ?>" class="widefat edit-menu-item-attr-title" name="menu-item-attr-title[<?php echo esc_html($item_id); ?>]" value="<?php echo esc_attr( $item->post_excerpt ); ?>" />
                     </label>
                 </p>
                 <p class="field-link-target description">
                     <label for="edit-menu-item-target-<?php echo esc_html($item_id); ?>">
                         <input type="checkbox" id="edit-menu-item-target-<?php echo esc_html($item_id); ?>" value="_blank" name="menu-item-target[<?php echo esc_html($item_id); ?>]"<?php checked( $item->target, '_blank' ); ?> />
-                        <?php _e( 'Open link in a new window/tab', "wpestate" ); ?>
+                        <?php esc_html_e( 'Open link in a new window/tab', "wpresidence" ); ?>
                     </label>
                 </p>
                 <p class="field-css-classes description description-thin">
                     <label for="edit-menu-item-classes-<?php echo esc_html($item_id); ?>">
-                        <?php _e( 'CSS Classes (optional)', "wpestate" ); ?><br />
+                        <?php esc_html_e( 'CSS Classes (optional)', "wpresidence" ); ?><br />
                         <input type="text" id="edit-menu-item-classes-<?php echo esc_html($item_id); ?>" class="widefat code edit-menu-item-classes" name="menu-item-classes[<?php echo esc_html($item_id); ?>]" value="<?php echo esc_attr( implode(' ', $item->classes ) ); ?>" />
                     </label>
                 </p>
                 <p class="field-xfn description description-thin">
                     <label for="edit-menu-item-xfn-<?php echo esc_html($item_id); ?>">
-                        <?php _e( 'Link Relationship (XFN)', "wpestate"  ); ?><br />
+                        <?php esc_html_e( 'Link Relationship (XFN)', "wpresidence"  ); ?><br />
                         <input type="text" id="edit-menu-item-xfn-<?php echo esc_html($item_id); ?>" class="widefat code edit-menu-item-xfn" name="menu-item-xfn[<?php echo esc_html($item_id); ?>]" value="<?php echo esc_attr( $item->xfn ); ?>" />
                     </label>
                 </p>
                 <p class="field-description description description-wide">
                     <label for="edit-menu-item-description-<?php echo esc_html($item_id); ?>">
-                        <?php _e( 'Description', "wpestate" ); ?><br />
+                        <?php esc_html_e( 'Description', "wpresidence" ); ?><br />
                         <textarea id="edit-menu-item-description-<?php echo esc_html($item_id); ?>" class="widefat edit-menu-item-description" rows="3" cols="20" name="menu-item-description[<?php echo esc_html($item_id); ?>]"><?php echo esc_html( $item->description ); // textarea_escaped ?></textarea>
-                        <span class="description"><?php _e('The description will be displayed in the menu if the current theme supports it.', "wpestate"); ?></span>
+                        <span class="description"><?php esc_html_e('The description will be displayed in the menu if the current theme supports it.', "wpresidence"); ?></span>
                     </label>
                 </p>
 
 
                 <p class="description description-wide">
                 <label for="edit-menu-item-target-<?php echo esc_html($item_id); ?>">
-                        <strong><?php _e( 'Menu Item Icon(ex: fa fa-comment)', "wpestate" ); ?></strong><br />
+                        <strong><?php esc_html_e( 'Menu Item Icon(ex: fa fa-comment)', "wpresidence" ); ?></strong><br />
                         <input class="widefat" type="text" id="edit-menu-item-menu-icon-<?php echo esc_html($item_id); ?>" name="menu-item-menu_icon[<?php echo esc_html($item_id); ?>]" value="<?php echo esc_attr( $item->menu_icon ); ?>" />   
                      
                 </label>
@@ -270,7 +270,7 @@ class Walker_Nav_Menu_Edit_Custom extends Walker_Nav_Menu  {
                 
                 <p class="description description-wide">
                 <label for="edit-menu-item-target-<?php echo esc_html($item_id); ?>">
-                        <strong><?php _e( 'Menu Item Label(ex: "new")', "wpestate" ); ?></strong><br />
+                        <strong><?php esc_html_e( 'Menu Item Label(ex: "new")', "wpresidence" ); ?></strong><br />
                         <input class="widefat" type="text" id="edit-menu-item-menu_label-<?php echo esc_html($item_id); ?>" name="menu-item-menu_label[<?php echo esc_html($item_id); ?>]" value="<?php echo esc_attr( $item->menu_label ); ?>" />   
                      
                 </label>
@@ -285,15 +285,15 @@ class Walker_Nav_Menu_Edit_Custom extends Walker_Nav_Menu  {
                     ?>
                     <label for="edit-menu-item-megamenu-<?php echo esc_html($item_id); ?>">
                         <input type="checkbox" value="enabled" class="edit-menu-item-wpestate-megamenu-check" id="edit-menu-item-megamenu-<?php echo esc_html($item_id); ?>" name="edit-menu-item-megamenu[<?php echo esc_html($item_id); ?>]" <?php echo esc_html($value); ?> />
-                        <strong><em><?php _e( 'Set as Mega Menu?', "wpestate" ); ?></em></strong>
+                        <strong><em><?php esc_html_e( 'Set as Mega Menu?', "wpresidence" ); ?></em></strong>
                     </label>
                 </p>
 
                  <p class="field-megamenu-widgets description description-wide">
                     <label for="edit-menu-item-megamenu-widgetarea-<?php echo esc_html($item_id); ?>">
-                        <?php _e( 'Mega Menu Widget Area', 'wpestate' ); ?>
+                        <?php esc_html_e( 'Mega Menu Widget Area', 'wpresidence' ); ?>
                         <select id="edit-menu-item-megamenu-widgetarea-<?php echo esc_html($item_id); ?>" class="widefat code edit-menu-item-megamenu-widgetarea" name="menu-item-megamenu-widgetarea[<?php echo esc_html($item_id); ?>]">
-                            <option value="0"><?php _e( 'Select Widget Area', 'wpestate' ); ?></option>
+                            <option value="0"><?php esc_html_e( 'Select Widget Area', 'wpresidence' ); ?></option>
                             <?php
                             if( ! empty( $wp_registered_sidebars ) && is_array( $wp_registered_sidebars ) ):
                             foreach( $wp_registered_sidebars as $sidebar ):
@@ -304,9 +304,9 @@ class Walker_Nav_Menu_Edit_Custom extends Walker_Nav_Menu  {
                     </label>
                 </p>
 
-                <a href="#" id="wpestate-media-upload-<?php echo esc_html($item_id); ?>" class="load_back_menu  "><?php _e( 'Upload Background Image | ', 'wpestate' ); ?></a>
+                <a href="#" id="wpestate-media-upload-<?php echo esc_html($item_id); ?>" class="load_back_menu  "><?php esc_html_e( 'Upload Background Image | ', 'wpresidence' ); ?></a>
               
-                <a href="#" id="wpestate-media-remove-<?php echo esc_html($item_id); ?>" class="remove-megamenu-background" style="<?php echo ( trim( $item->megamenu_background ) ) ? 'display: inline;' : '';?>"><?php _e('Remove Image','wpestate');?></a>
+                <a href="#" id="wpestate-media-remove-<?php echo esc_html($item_id); ?>" class="remove-megamenu-background" style="<?php echo ( trim( $item->megamenu_background ) ) ? 'display: inline;' : '';?>"><?php esc_html_e('Remove Image','wpresidence');?></a>
                 <p class="field-megamenu-background description description-wide">
                     <label for="edit-menu-item-megamenu-background-<?php echo esc_html($item_id); ?>">
                         <input type="hidden" id="edit-menu-item-megamenu-background-<?php echo esc_html($item_id); ?>" class="widefat code edit-menu-item-megamenu-background" name="menu-item-megamenu-background[<?php echo esc_html($item_id); ?>]" value="<?php echo esc_html($item->megamenu_background); ?>" />
@@ -317,7 +317,7 @@ class Walker_Nav_Menu_Edit_Custom extends Walker_Nav_Menu  {
 
                 <p class="field-megamenu-styles description description-wide">
                     <label for="edit-menu-item-megamenu-styles-<?php echo esc_html($item_id); ?>">
-                        <?php _e( 'Container Styles( *set custom styles for mega menu container only:.  Ex: background position, background repeat )', "wpestate" ); ?><br />
+                        <?php esc_html_e( 'Container Styles( *set custom styles for mega menu container only:.  Ex: background position, background repeat )', "wpresidence" ); ?><br />
                         <textarea id="edit-menu-item-megamenu-styles-<?php echo esc_html($item_id); ?>" class="widefat edit-menu-item-megamenu-styles" rows="3" cols="20" name="menu-item-megamenu-styles[<?php echo esc_html($item_id); ?>]"><?php echo esc_html( $item->megamenu_styles ); // textarea_escaped ?></textarea>
                     </label>
                 </p>
@@ -333,7 +333,7 @@ class Walker_Nav_Menu_Edit_Custom extends Walker_Nav_Menu  {
                     ?>
                     <label for="menu-item-megamenu-border-<?php echo esc_html($item_id); ?>">
                         <input type="checkbox" value="enabled" class="menu-item-megamenu-border" id="menu-item-megamenu-border-<?php echo esc_html($item_id); ?>" name="menu-item-megamenu-border[<?php echo esc_html($item_id); ?>]" <?php echo esc_html($value); ?> />
-                        <strong><em><?php _e( 'Draw border right on mega menu column?', "wpestate" ); ?></em></strong>
+                        <strong><em><?php esc_html_e( 'Draw border right on mega menu column?', "wpresidence" ); ?></em></strong>
                     </label>
                 </p>
            
@@ -341,7 +341,7 @@ class Walker_Nav_Menu_Edit_Custom extends Walker_Nav_Menu  {
                 <div class="menu-item-actions description-wide submitbox">
                     <?php if( 'custom' != $item->type && $original_title !== false ) : ?>
                         <p class="link-to-original">
-                            <?php printf( __('Original: %s', "wpestate"), '<a href="' . esc_attr( $item->url ) . '">' . esc_html( $original_title ) . '</a>' ); ?>
+                            <?php printf( esc_html__('Original: %s', "wpresidence"), '<a href="' . esc_url( $item->url ) . '">' . esc_html( $original_title ) . '</a>' ); ?>
                         </p>
                     <?php endif; ?>
                     <a class="item-delete submitdelete deletion" id="delete-<?php echo esc_html($item_id); ?>" href="<?php
@@ -351,11 +351,11 @@ class Walker_Nav_Menu_Edit_Custom extends Walker_Nav_Menu  {
                                 'action' => 'delete-menu-item',
                                 'menu-item' => $item_id,
                             ),
-                            remove_query_arg($removed_args, admin_url( 'nav-menus.php' ) )
+                            remove_query_arg($removed_args, esc_url(admin_url( 'nav-menus.php' )) )
                         ),
                         'delete-menu_item_' . $item_id
-                    ); ?>"><?php _e('Remove', "wpestate" ); ?></a> <span class="meta-sep"> | </span> <a class="item-cancel submitcancel" id="cancel-<?php echo esc_html($item_id); ?>" href="<?php echo esc_url( add_query_arg( array('edit-menu-item' => $item_id, 'cancel' => time()), remove_query_arg( $removed_args, admin_url( 'nav-menus.php' ) ) ) );
-                        ?>#menu-item-settings-<?php echo esc_html($item_id); ?>"><?php _e('Cancel', "wpestate"); ?></a>
+                    ); ?>"><?php esc_html_e('Remove', "wpresidence" ); ?></a> <span class="meta-sep"> | </span> <a class="item-cancel submitcancel" id="cancel-<?php echo esc_html($item_id); ?>" href="<?php echo esc_url( add_query_arg( array('edit-menu-item' => $item_id, 'cancel' => time()), remove_query_arg( $removed_args, esc_url(admin_url( 'nav-menus.php' ) ) ) ) );
+                        ?>#menu-item-settings-<?php echo esc_html($item_id); ?>"><?php esc_html_e('Cancel', "wpresidence"); ?></a>
                 </div>
 
                 <?php
@@ -399,7 +399,7 @@ class wpestate_custom_walker extends Walker_Nav_Menu {
             {
             
                 if( !empty($this->megamenu_background)) {
-                    $style .= 'Background-image:url('.$this->megamenu_background.');';
+                    $style .= 'Background-image:url('.esc_url($this->megamenu_background).');';
                 }
                 
                 if (!empty($this->megamenu_styles) ){
@@ -425,7 +425,7 @@ class wpestate_custom_walker extends Walker_Nav_Menu {
                 if($this->active_megamenu)
                 {
 
-                    $output = str_replace("{to_replace_class}", "wpestate_megamenu_col_".$this->max_columns."", $output);
+                    $output = str_replace("{to_replace_class}", "wpestate_megamenu_class wpestate_megamenu_col_".$this->max_columns."", $output);
                     
                     foreach($this->rowsCounter as $row => $columns)
                     {
@@ -499,7 +499,7 @@ class wpestate_custom_walker extends Walker_Nav_Menu {
 
                         $item_output .= $args->before;
                         $item_output .= '<div class="megamenu-title"'. $attributes .'>';
-                        $item_output .= '<a href="'.$item->url.'">';
+                        $item_output .= '<a href="'.esc_url($item->url).'">';
                         $item_output .= $menu_icon_tag;
                         $item_output .= $args->link_before . $title . $args->link_after;
                         $item_output .= $menu_label_tag;
@@ -512,7 +512,9 @@ class wpestate_custom_walker extends Walker_Nav_Menu {
                      if( is_active_sidebar( $this->megamenu_widgetarea )) {
                         $item_output .= '<div class="megamenu-widgets-container">';
                         ob_start();
-                        dynamic_sidebar( $this->megamenu_widgetarea );
+                        if ( is_active_sidebar( $this->megamenu_widgetarea  ) ) {
+                            dynamic_sidebar( $this->megamenu_widgetarea );
+                        }
                         $temp=ob_get_contents();
                         ob_end_clean(); 
                         $item_output .= '<ul>'.$temp. '</ul></div>';
@@ -529,7 +531,9 @@ class wpestate_custom_walker extends Walker_Nav_Menu {
                 if( is_active_sidebar( $this->megamenu_widgetarea ) ) {
                     $item_output .= '<div class="megamenu-widgets-container">';
                     ob_start();
-                    dynamic_sidebar( $this->megamenu_widgetarea );
+                    if ( is_active_sidebar( $this->megamenu_widgetarea   ) ) {
+                        dynamic_sidebar( $this->megamenu_widgetarea );
+                    }
                     $temp=ob_get_contents();
                     ob_end_clean(); 
                     $item_output .= '<ul>'.$temp. '</ul></div>';

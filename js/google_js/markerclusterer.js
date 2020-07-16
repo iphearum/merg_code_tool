@@ -1251,7 +1251,7 @@ MarkerClusterer.prototype.removeMarker = function (marker, opt_nodraw) {
  * @param {boolean} [opt_nodraw] Set to <code>true</code> to prevent redrawing.
  * @return {boolean} True if markers were removed from the clusterer.
  */
-MarkerClusterer.prototype.removeMarkers = function (markers, opt_nodraw) {
+MarkerClusterer.prototype.wpestate_removeMarkers = function (markers, opt_nodraw) {
   var i, r;
   var removed = false;
 

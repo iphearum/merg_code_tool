@@ -1,4 +1,5 @@
 <?php
+if(function_exists('wpestate_update_hiddent_address')):
 function wpestate_update_hiddent_address(){
     wp_suspend_cache_addition(true);    
     $args = array(
@@ -63,9 +64,11 @@ function wpestate_update_hiddent_address(){
 
 
 }
+endif;
 
 
 
+if(!function_exists('wpestate_update_hiddent_address_single')):
 function wpestate_update_hiddent_address_single($edit_id){
         $edit_id= intval($edit_id);
         $hidden_address     =   '';
@@ -82,25 +85,28 @@ function wpestate_update_hiddent_address_single($edit_id){
 
 
         $property_area_array            =   get_the_terms($edit_id, 'property_area');
-        if(isset($property_area_array [0])){
-            $property_area                  =   $property_area_array [0]->name;
+        if(is_array($property_area_array)){
+            foreach ($property_area_array as $item) {
+              $hidden_address .=$item->name.', ';
+            }
         }
-        $hidden_address .=$property_area.', ';  
-
-        $property_city_array            =   get_the_terms($edit_id, 'property_city');
-        if(isset($property_city_array [0])){
-            $property_city                  =   $property_city_array [0]->name;
+      
+        
+        $property_city_array            =   get_the_terms($edit_id, 'property_city');    
+        if(is_array($property_city_array)){
+            foreach ($property_city_array as $item) {
+              $hidden_address .=$item->name.', ';
+            }
         }
-        $hidden_address .=$property_city.', ';
 
 
 
-        $property_county_state_array            =   get_the_terms($edit_id, 'property_county_state');
-        if(isset($property_county_state_array [0])){
-            $property_county_state                 =   $property_county_state_array [0]->name;
+        $property_county_state_array            =   get_the_terms($edit_id, 'property_county_state');      
+        if(is_array($property_county_state_array)){
+            foreach ($property_county_state_array as $item) {
+              $hidden_address .=$item->name.', ';
+            }
         }
-        $hidden_address .=$property_county_state.', ';
-
      
 
         update_post_meta($edit_id, 'hidden_address', $hidden_address);
@@ -109,3 +115,4 @@ function wpestate_update_hiddent_address_single($edit_id){
 
 
 }
+endif;

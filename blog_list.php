@@ -2,17 +2,13 @@
 // Template Name: Blog list page
 // Wp Estate Pack
 get_header();
-global $no_listins_per_row;
-$options            =   wpestate_page_details($post->ID);
-$blog_unit          =   esc_html ( get_option('wp_estate_blog_unit','') ); 
-$no_listins_per_row =   intval( get_option('wp_estate_blog_listings_per_row', '') );
+$wpestate_options            =   wpestate_page_details($post->ID);
+$blog_unit                   =   esc_html ( wpresidence_get_option('wp_estate_blog_unit','') ); 
+$wpestate_no_listins_per_row =   intval( wpresidence_get_option('wp_estate_blog_listings_per_row', '') );
 ?>
-
-
-
 <div class="row">
     <?php get_template_part('templates/breadcrumbs'); ?>
-    <div class=" <?php print esc_html($options['content_class']);?> ">
+    <div class=" <?php print esc_html($wpestate_options['content_class']);?> ">
         <?php get_template_part('templates/ajax_container'); ?>
         <?php while (have_posts()) : the_post(); ?>
         <?php if (esc_html( get_post_meta($post->ID, 'page_show_title', true) ) == 'yes') { ?>
@@ -35,9 +31,9 @@ $no_listins_per_row =   intval( get_option('wp_estate_blog_listings_per_row', ''
             
             while ($blog_selection->have_posts()): $blog_selection->the_post();
                 if($blog_unit=='list'){
-                    get_template_part('templates/blog_unit');
+                     include( locate_template('templates/blog_unit.php') ) ;
                 }else{
-                    get_template_part('templates/blog_unit2');
+                     include( locate_template('templates/blog_unit2.php') ) ;
                 }              
             endwhile;
             wp_reset_query();
@@ -45,21 +41,10 @@ $no_listins_per_row =   intval( get_option('wp_estate_blog_listings_per_row', ''
         
            
         </div>
-        <?php kriesi_pagination($blog_selection->max_num_pages, $range = 2); ?>    
+        <?php wpestate_pagination($blog_selection->max_num_pages, $range = 2); ?>    
     </div><!-- end 9col container-->
     
-<?php  include(locate_template('sidebar.php')); ?>
+<?php  include get_theme_file_path('sidebar.php'); ?>
 </div>   
-
-
-
-
-
-
-
-
-
-
-
 
 <?php get_footer(); ?>

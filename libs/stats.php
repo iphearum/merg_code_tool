@@ -40,13 +40,7 @@ if( !function_exists('wp_estate_count_page_stats') ):
         $detailed_views=  update_post_meta($prop_id, 'wpestate_detailed_views', $detailed_views);
        
         
-        // ro remove 
-        /*   
-        print 'todal views'.  $total_views=  get_post_meta($prop_id, 'wpestate_total_views', true).'/';
-        $detailed_views=  get_post_meta($prop_id, 'wpestate_detailed_views', true);
-        //print_R($detailed_views);      
-        
-        */    
+       
     }
 endif;
 

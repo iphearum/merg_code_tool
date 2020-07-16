@@ -1,27 +1,25 @@
 <?php
 // Wp Estate Pack
 get_header();
-$options=wpestate_page_details($post->ID); 
+$wpestate_options=wpestate_page_details(''); 
 ?>
-
-
 
 <div class="row">
     <?php get_template_part('templates/breadcrumbs'); ?>
-    <div class="<?php print esc_html($options['content_class']);?> ">
+    <div class="<?php print esc_html($wpestate_options['content_class']);?> ">
         
          <?php get_template_part('templates/ajax_container'); ?>
         
        
-           <h1 class="entry-title"><?php _e('Page not found','wpestate');?></h1>
+           <h1 class="entry-title"><?php _e('Page not found','wpresidence');?></h1>
          
             <div class="single-content content404 col-md-12">    
                 <p>
-                <?php _e( 'We\'re sorry. Your page could not be found, But you can check our latest listings & articles', 'wpestate' ); ?>
+                <?php _e( 'We\'re sorry. Your page could not be found, But you can check our latest listings & articles', 'wpresidence' ); ?>
                 </p>
 
                 <div class="list404">  
-                <h3><?php _e('Latest Listings','wpestate');?></h3>
+                <h3><?php _e('Latest Listings','wpresidence');?></h3>
                 <?php
                  
                 $args = array(
@@ -34,14 +32,14 @@ $options=wpestate_page_details($post->ID);
                  $recent_posts = new WP_Query($args);
                    print '<ul>';
                    while ($recent_posts->have_posts()): $recent_posts->the_post();
-                        print '<li><a href="'.get_permalink().'">'.get_the_title().'</a></li>';
+                        print '<li><a href="'. esc_url( get_permalink() ).'">'.get_the_title().'</a></li>';
                    endwhile;
                    print '</ul>';
                 ?>
                 </div>
 
                 <div class="list404">  
-                <h3><?php _e('Latest Articles','wpestate');?></h3>
+                <h3><?php _e('Latest Articles','wpresidence');?></h3>
                 <?php
                   $args = array(
                      'post_type'        => 'post',
@@ -53,7 +51,7 @@ $options=wpestate_page_details($post->ID);
                  $recent_posts = new WP_Query($args);
                    print '<ul>';
                    while ($recent_posts->have_posts()): $recent_posts->the_post();
-                        print '<li><a href="'.get_permalink().'">'.get_the_title().'</a></li>';
+                        print '<li><a href="'. esc_url( get_permalink() ).'">'.get_the_title().'</a></li>';
                    endwhile;
                    print '</ul>';
                 ?>
@@ -64,6 +62,8 @@ $options=wpestate_page_details($post->ID);
     </div>
   
     
-<?php  include(locate_template('sidebar.php')); ?>
+<?php 
+include get_theme_file_path('sidebar.php');
+?>
 </div>   
 <?php get_footer(); ?>

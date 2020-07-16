@@ -7,6 +7,7 @@ global $submission_curency_status;
 global $price_submission;
 global $floor_link;
 global $user_pack;
+global $user_login;
 
 $post_id                    =   get_the_ID();
 $featured                   =   intval  ( get_post_meta($post_id, 'prop_featured', true) );
@@ -19,52 +20,33 @@ $property_city              =   get_the_term_list($post_id, 'property_city', '',
 $property_category          =   get_the_term_list($post_id, 'property_category', '', ', ', '');
 $property_action_category   =   get_the_term_list($post_id, 'property_action_category', '', ', ', '');
 $price_label                =   esc_html ( get_post_meta($post_id, 'property_label', true) );
-$price_label_before                =   esc_html ( get_post_meta($post_id, 'property_label_before', true) );
+$price_label_before         =   esc_html ( get_post_meta($post_id, 'property_label_before', true) );
 $price                      =   floatval( get_post_meta($post->ID, 'property_price', true) );
-$currency                   =   esc_html( get_option('wp_estate_submission_curency', '') );
-$currency_title             =   esc_html( get_option('wp_estate_currency_symbol', '') );
-$where_currency             =   esc_html( get_option('wp_estate_where_currency_symbol', '') );
+$wpestate_currency          =   esc_html( wpresidence_get_option('wp_estate_submission_curency', '') );
+$currency_title             =   esc_html( wpresidence_get_option('wp_estate_currency_symbol', '') );
+$where_currency             =   esc_html( wpresidence_get_option('wp_estate_where_currency_symbol', '') );
 $status                     =   '';
 $link                       =   '';
 $pay_status                 =   '';
 $is_pay_status              =   '';
-$paid_submission_status     =   esc_html ( get_option('wp_estate_paid_submission','') );
-$price_submission           =   floatval( get_option('wp_estate_price_submission','') );
-$price_featured_submission  =   floatval( get_option('wp_estate_price_featured_submission','') );
-$th_separator               =   stripslashes ( get_option('wp_estate_prices_th_separator','') );
-$no_views                   =    intval( get_post_meta($post_id, 'wpestate_total_views', true));
-$specific_price                      =   ( get_post_meta($post->ID, 'specific_price', true) );
-$businesstype          =   ( get_post_meta($post->ID, 'businesstype', true) );
-$businesstype           = get_term_by('id', $businesstype, 'businesstype');
-$businesstype   =   $businesstype->name;
-
-// $property_city  =  ( get_post_meta($post->ID, 'property_city', true) );
-$property_address =esc_html( get_post_meta($post->ID, 'property_city', true) );
-$property_address   =   get_term_name_by_id($property_address,'property_city');
-
-$property_category =esc_html( get_post_meta($post->ID, 'property_category', true) );
-$property_category   =   get_term_name_by_id($property_category,'property_category');
-
-$website_address  =  ( get_post_meta($post->ID, 'website_address', true) );
-/*$property_city           = get_term_by('id', $property_city, 'property_city');
-$property_city   =   $property_city->name;*/
-
+$paid_submission_status     =   esc_html ( wpresidence_get_option('wp_estate_paid_submission','') );
+$price_submission           =   floatval( wpresidence_get_option('wp_estate_price_submission','') );
+$price_featured_submission  =   floatval( wpresidence_get_option('wp_estate_price_featured_submission','') );
+$th_separator               =   stripslashes ( wpresidence_get_option('wp_estate_prices_th_separator','') );
+$no_views                   =   intval( get_post_meta($post_id, 'wpestate_total_views', true));
 if ($price != 0) {
-   
-    if( $price == intval($price)){
-              
+    if( $price == intval($price)){            
         $price = number_format($price,0,'.',$th_separator);
     }else{
-
         $price = number_format($price,2,'.',$th_separator);
     }
    
    if ($where_currency == 'before') {
        $price_title =   $currency_title . ' ' . $price;
-       $price       =   $currency . ' ' . $price;
+       $price       =   $wpestate_currency . ' ' . $price;
    } else {
        $price_title = $price . ' ' . $currency_title;
-       $price       = $price . ' ' . $currency;
+       $price       = $price . ' ' . $wpestate_currency;
      
    }
 }else{
@@ -75,121 +57,128 @@ if ($price != 0) {
 
 
 if($post_status=='expired'){ 
-    $status='<span class="label label-danger">'.__('Expired','wpestate').'</span>';
+    $status='<span class="label label-danger">'.esc_html__('Expired','wpresidence').'</span>';
 }else if($post_status=='publish'){ 
-    $link=get_permalink();
-    $status='<span class="label label-success">'.__('Published','wpestate').'</span>';
+    $link= esc_url( get_permalink() );
+    $status='<span class="label label-success">'.esc_html__('Published','wpresidence').'</span>';
 }else if($post_status=='disabled'){
     $link='';
-    $status='<span class="label label-info">'.__('Disabled','wpestate').'</span>';
+    $status='<span class="label label-info">'.esc_html__('Disabled','wpresidence').'</span>';
 }else{
     $link='';
-    $status='<span class="label label-info">'.__('Waiting for approval','wpestate').'</span>';
+    $status='<span class="label label-info">'.esc_html__('Waiting for approval','wpresidence').'</span>';
 }
 
 
 if ($paid_submission_status=='per listing'){
     $pay_status    = get_post_meta(get_the_ID(), 'pay_status', true);
     if($pay_status=='paid'){
-        $is_pay_status.='<span class="label label-success">'.__('Paid','wpestate').'</span>';
+        $is_pay_status.='<span class="label label-success">'.esc_html__('Paid','wpresidence').'</span>';
     }
     if($pay_status=='not paid'){
-        $is_pay_status.='<span class="label label-info">'.__('Not Paid','wpestate').'</span>';
+        $is_pay_status.='<span class="label label-info">'.esc_html__('Not Paid','wpresidence').'</span>';
     }
 }
 $featured  = intval  ( get_post_meta($post->ID, 'prop_featured', true) );
 
 
-$free_feat_list_expiration= intval ( get_option('wp_estate_free_feat_list_expiration','') );
-$pfx_date = strtotime ( get_the_date("Y-m-d",  $post->ID ) );
-$expiration_date=$pfx_date+$free_feat_list_expiration*24*60*60;
+$free_feat_list_expiration  =   intval ( wpresidence_get_option('wp_estate_free_feat_list_expiration','') );
+$pfx_date                   =   strtotime ( get_the_date("Y-m-d",  $post->ID ) );
+$expiration_date            =   $pfx_date+$free_feat_list_expiration*24*60*60;
 ?>
 
 
 
 <div class="col-md-12 row_dasboard-prop-listing property_wrapper_dash">
     <div class="col-md-12 dasboard-prop-listing">
-       <div class="blog_listing_image">
+     
+        <?php
+        $author = get_the_author();
+        if($user_login!=$author){
+            print '   <div class="dashboard_unit_author_info">'.esc_html__('by','wpresidence').' '.esc_html($author).'  </div>';
+        }
+        ?>
+      
+        <div class="blog_listing_image">
            <?php
             if($featured==1){
-                print '<div class="featured_div">'.__('Featured','wpestate').'</div>';
+                print '<div class="featured_div">'.esc_html__('Featured','wpresidence').'</div>';
             }
-
             if (has_post_thumbnail($post_id)){
             ?>
-                <a href="<?php print esc_url($link); ?>"><img  src="<?php  print $preview[0]; ?>"  alt="slider-thumb" /></a>
+                <a href="<?php print esc_url($link); ?>"><img  src="<?php  print esc_url($preview[0]); ?>" /></a>
             <?php 
             } 
-            if ( $preview[0] == '') {
-            ?>               
-                <a href="<?php print esc_url($link); ?>"><img  src="http://ppc.tools/wp-content/themes/ppctools/img/no-thumbnail.jpg"  alt="slider-thumb" /></a>
-            <?php
-            }
             ?>
-       </div>
+        </div>
 
         <div class="user_dashboard_status">
-            <?php print ($status.$is_pay_status);?>      
+            <?php print trim($status.$is_pay_status);?>      
         </div>
         
         <div class="prop-info">
             <h4 class="listing_title">
                 <a href="<?php print esc_url($link); ?>">
                     <?php 
-                    $title = get_the_title();
+                    $title=get_the_title();
                     echo mb_substr( $title,0,40); 
-                    if( mb_strlen ($title) > 40){
+                    if(mb_strlen($title)>40){
                         echo '...';   
                     } ?>
                 </a> 
             </h4>
 
             <div class="user_dashboard_listed">
-                <?php print __('Price','wpestate').': <span class="price_label"> '.usd_show(custom_number_format($specific_price)).' </span>';?>
+                <?php print esc_html__('Price','wpresidence').': <span class="price_label">'.esc_html($price_label_before).' '.esc_html($price_title).' '.esc_html($price_label).'</span>';?>
                 <?php 
                 if ( $paid_submission_status=='membership' && $user_pack=='') {
-                    echo ' | ' ; _e('expires on ','wpestate');echo date("Y-m-d", strtotime("+1 month", $expiration_date));
+                    echo ' | ' ;esc_html_e('expires on ','wpresidence');echo date("Y-m-d",$expiration_date);
                 } ?>
             </div>
 
             <div class="user_dashboard_listed">
-                        
+                <?php esc_html_e('Listed in','wpresidence');?>  
+                <?php print wp_kses_post($property_action_category); ?> 
+                <?php 
+                    if( $property_action_category!='') {
+                        print' '.esc_html__('and','wpresidence').' ';
+                    } 
+                    print wp_kses_post($property_category);
+                ?>                     
             </div>
 
             <div class="user_dashboard_listed">
-                 <?php print __('Category','wpestate').': ';?> 
-                 <?php print '<b>'.$property_category.'</b>';?>    |   
-                <?php print __('City','wpestate').': ';?>            
-                <?php print $property_address;?>        
+                <?php print esc_html__('City','wpresidence').': ';?>            
+                <?php print get_the_term_list($post_id, 'property_city', '', ', ', '');?>
+                <?php print ', '.esc_html__('Area','wpresidence').': '?>
+                <?php print get_the_term_list($post_id, 'property_area', '', ', ', '');?>          
             </div>
 
-            <div class="user_dashboard_listed">
-                <?php print __('Website Address','wpestate').': ';?>            
-                <?php print '<a href="'.$website_address.'" target="_blank">'.$website_address.'</a>';?>        
-            </div>
             <?php
-                $edit_link = $edit_link.'&type='.$post->post_content_filtered;
+            $defaults = array(
+                'echo'   => false,
+            );
             ?>
             <div class="info-container">
-                <a  data-original-title="<?php _e('Edit property','wpestate');?>"   class="dashboad-tooltip" href="<?php  print esc_url($edit_link);?>"><i class="fa fa-pencil-square-o editprop"></i></a>
-                <a  data-original-title="<?php _e('Delete property','wpestate');?>" class="dashboad-tooltip" onclick="return confirm(' <?php echo __('Are you sure you wish to delete ','wpestate').get_the_title(); ?>?')" href="<?php print esc_url_raw(add_query_arg( 'delete_id', $post_id,  $_SERVER['REQUEST_URI']  ) );?>"><i class="fa fa-times deleteprop"></i></a>  
-                <a  data-original-title="<?php _e('Floor Plans','wpestate');?>"   class="dashboad-tooltip" href="<?php  print esc_url($floor_link);?>"><i class="fa  fa-book editprop"></i></a>
+                <a  data-original-title="<?php esc_attr_e('Edit property','wpresidence');?>"   class="dashboad-tooltip" href="<?php  print esc_url($edit_link);?>"><i class="fas fa-pen-square editprop"></i></a>
+                <a  data-original-title="<?php esc_attr_e('Delete property','wpresidence');?>" class="dashboad-tooltip" onclick="return confirm(' <?php echo esc_html__('Are you sure you wish to delete ','wpresidence').the_title_attribute($defaults); ?>?')" href="<?php print esc_url_raw(add_query_arg( 'delete_id', $post_id, wpestate_get_template_link('user_dashboard.php') ) );?>"><i class="fas fa-times deleteprop"></i></a>  
+                <a  data-original-title="<?php esc_attr_e('Floor Plans','wpresidence');?>"   class="dashboad-tooltip" href="<?php  print esc_url($floor_link);?>"><i class="fa  fa-book editprop"></i></a>
                 <?php if ($no_views>0){ ?>
-                <a  data-original-title="<?php _e('Views Stats','wpestate');?>"   class="dashboad-tooltip show_stats"  data-listingid="<?php echo intval($post_id);?>" href="#"><i class="fa fa-eye-slash "></i></a>
+                <a  data-original-title="<?php esc_attr_e('Views Stats','wpresidence');?>"   class="dashboad-tooltip show_stats"  data-listingid="<?php echo intval($post_id);?>" href="#"><i class="fas fa-eye-slash"></i></a>
                 <?php }else{ ?>
-                    <a  data-original-title="<?php _e('Item has 0 views','wpestate');?>"   class="dashboad-tooltip show_statsx"  data-listingid="<?php echo intval($post_id);?>" href="#"><i class="fa fa-eye-slash "></i></a>
+                    <a  data-original-title="<?php esc_attr_e('Item has 0 views','wpresidence');?>"   class="dashboad-tooltip show_statsx"  data-listingid="<?php echo intval($post_id);?>" href="#"><i class="fas fa-eye-slash"></i></a>
                 <?php }?>
                 <?php
                     if( $post_status == 'expired' ){ 
-                       print'<a data-original-title="'.__('Resend for approval','wpestate').'" class="dashboad-tooltip resend_pending" data-listingid="'.$post_id.'"><i class="fa fa-upload "></i></a>';   
+                       print'<a data-original-title="'.esc_attr__('Resend for approval','wpresidence').'" class="dashboad-tooltip resend_pending" data-listingid="'.intval($post_id).'"><i class="fas fa-upload"></i></a>';   
                     }
                 ?>    
 
                 <?php
                    if( $post_status == 'publish' ){ 
-                       print ' <span  data-original-title="'.__('Disable Listing','wpestate').'" class="dashboad-tooltip disable_listing disabledx" data-postid="'.$post_id.'" ><i class="fa fa-pause"></i></span>';
+                       print ' <span  data-original-title="'.esc_attr__('Disable Listing','wpresidence').'" class="dashboad-tooltip disable_listing disabledx" data-postid="'.intval($post_id).'" ><i class="fas fa-pause"></i></span>';
                    }else if($post_status=='disabled') {
-                       print ' <span  data-original-title="'.__('Enable Listing','wpestate').'" class="dashboad-tooltip disable_listing" data-postid="'.$post_id.'" ><i class="fa fa-play"></i></span>';
+                       print ' <span  data-original-title="'.esc_attr__('Enable Listing','wpresidence').'" class="dashboad-tooltip disable_listing" data-postid="'.intval($post_id).'" ><i class="fas fa-play"></i></span>';
 
                    }
                 ?>
@@ -199,10 +188,10 @@ $expiration_date=$pfx_date+$free_feat_list_expiration*24*60*60;
                 if($paid_submission_status=='membership'){
                     $no_payment=' no_payment ';
                     if ( intval(get_post_meta($post_id, 'prop_featured', true))==1){
-                         print '<span class="label label-success">'.__('Property is featured','wpestate').'</span>';       
+                         print '<span class="label label-success">'.esc_html__('Property is featured','wpresidence').'</span>';       
                     }
                     else{
-                        print ' <span  data-original-title="'.__('Set as featured,  *Listings set as featured are subtracted from your package','wpestate').'" class="dashboad-tooltip make_featured" data-postid="'.$post_id.'" ><i class="fa fa-star favprop"></i></span>';
+                        print ' <span  data-original-title="'.esc_attr__('Set as featured,  *Listings set as featured are subtracted from your package','wpresidence').'" class="dashboad-tooltip make_featured" data-postid="'.intval($post_id).'" ><i class="fas fa-star favprop"></i></span>';
                     }
                 }
 
@@ -218,57 +207,58 @@ $expiration_date=$pfx_date+$free_feat_list_expiration*24*60*60;
             <div class="payment-container <?php echo esc_html($no_payment); ?>">
                 <?php $pay_status    = get_post_meta($post_id, 'pay_status', true);
                     if( $post_status == 'expired' ){ 
-                    //   print'<span data-original-title="'.__('Resend for approval','wpestate').'" class="dashboad-tooltip resend_pending" data-listingid="'.$post_id.'"><i class="fa fa-upload deleteprop"></i></span>';   
+                        
                     }else{
 
-
-
                         if($paid_submission_status=='per listing'){
-                            $enable_paypal_status= esc_html ( get_option('wp_estate_enable_paypal','') );
-                            $enable_stripe_status= esc_html ( get_option('wp_estate_enable_stripe','') );
-                            $enable_direct_status= esc_html ( get_option('wp_estate_enable_direct_pay','') );
+                            $enable_paypal_status= esc_html ( wpresidence_get_option('wp_estate_enable_paypal','') );
+                            $enable_stripe_status= esc_html ( wpresidence_get_option('wp_estate_enable_stripe','') );
+                            $enable_direct_status= esc_html ( wpresidence_get_option('wp_estate_enable_direct_pay','') );
 
                             if($pay_status!='paid' ){
                                 print' 
-                                    <div class="listing_submit">
-                                    '.__('Submission Fee','wpestate').': <span class="submit-price submit-price-no">'.$price_submission.'</span><span class="submit-price"> '.$currency.'</span></br>
-                                    <input type="checkbox" class="extra_featured" name="extra_featured" style="display:block;" value="1" >
-                                    '.__('Featured Fee','wpestate').': <span class="submit-price submit-price-featured">'.$price_featured_submission.'</span><span class="submit-price"> '.$currency.'</span> </br>
-                                    '.__('Total Fee','wpestate').': <span class="submit-price submit-price-total">'.$price_submission.'</span> <span class="submit-price">'.$currency.'</span>  </br> ';
-                                    print  '</div>'; 
-                                    $stripe_class='';
-                                    if($enable_paypal_status==='yes'){
-                                        $stripe_class=' stripe_paypal ';
-                                        print ' <div class="listing_submit_normal label label-danger" data-listingid="'.$post_id.'">'.__('Pay with Paypal','wpestate').'</div>';
-                                    }
+                                    <div class="listing_submit">'.esc_html__('Submission Fee','wpresidence').': <span class="submit-price submit-price-no">'.esc_html($price_submission).'</span><span class="submit-price"> '.esc_html($wpestate_currency).'</span></br></div>'; 
+                                   
+                                    global $wpestate_global_payments;
+                                    if($wpestate_global_payments->is_woo=='yes'){
+                                        $wpestate_global_payments->show_button_pay($post_id,'','',$price_submission,2);
+                                    }else{
+                                        $stripe_class='';
+                                        if($enable_paypal_status==='yes'){
+                                            $stripe_class=' stripe_paypal ';
+                                            print ' <div class="listing_submit_normal label label-danger" data-listingid="'.intval($post_id).'">'.esc_html__('Pay with Paypal','wpresidence').'</div>';
+                                        }
 
-                                    if($enable_stripe_status==='yes'){
-                                        wpestate_show_stripe_form_per_listing($stripe_class,$post_id,$price_submission,$price_featured_submission);
+                                        if($enable_stripe_status==='yes'){
+                                            wpestate_show_stripe_form_per_listing($stripe_class,$post_id,$price_submission,$price_featured_submission);
+                                        }
+                                        if($enable_direct_status=='yes'){
+                                            print '<div data-listing="'.intval($post_id).'" class="perpack">'.esc_html__('Wire Transfer','wpresidence').'</div>';
+                                        }
                                     }
-                                    if($enable_direct_status=='yes'){
-                                        print '<div data-listing="'.$post_id.'" class="perpack">'.__('Wire Transfer','wpestate').'</div>';
-                                    }
-
-
 
                             }else{
                                 if ( intval(get_post_meta($post_id, 'prop_featured', true))==1){
-                                    print '<span class="label label-success featured_label">'.__('Property is featured','wpestate').'</span>';  
+                                    print '<span class="label label-success featured_label">'.esc_html__('Property is featured','wpresidence').'</span>';  
                                 }else{
                                      print' 
                                      <div class="listing_submit upgrade_post">
-                                    '.__('Featured  Fee','wpestate').': <span class="submit-price submit-price-total">'.$price_featured_submission.'</span> <span class="submit-price">'.$currency.'</span>  </br> ';
+                                    '.esc_html__('Featured  Fee','wpresidence').': <span class="submit-price submit-price-total">'.esc_html($price_featured_submission).'</span> <span class="submit-price">'.esc_html($wpestate_currency).'</span>  </br> ';
                                     print  '</div>'; 
 
-                                    $stripe_class='';
-                                    if($enable_paypal_status==='yes'){
-                                        print'<span class="listing_upgrade label label-danger" data-listingid="'.$post_id.'">'.__('Upgrade to featured','wpestate').' - '.$price_featured_submission.' '.$currency.'</span>'; 
-                                    }
-                                    if($enable_stripe_status==='yes'){
-                                        wpestate_show_stripe_form_upgrade($stripe_class,$post_id,$price_submission,$price_featured_submission);
-                                    }
-                                    if($enable_direct_status=='yes'){
-                                        print '<div data-listing="'.$post_id.'" data-isupgrade="1" class="perpack">'.__('Upgrade to featured','wpestate').'</div>';
+                                    if($wpestate_global_payments->is_woo=='yes'){
+                                        $wpestate_global_payments->show_button_pay($post_id,'','',$price_featured_submission,3);
+                                    }else{
+                                        $stripe_class='';
+                                        if($enable_paypal_status==='yes'){
+                                            print'<span class="listing_upgrade label label-danger" data-listingid="'.intval($post_id).'">'.esc_html__('Upgrade to featured','wpresidence').' - '.esc_html($price_featured_submission).' '.esc_html($wpestate_currency).'</span>'; 
+                                        }
+                                        if($enable_stripe_status==='yes'){
+                                            wpestate_show_stripe_form_upgrade($stripe_class,$post_id,$price_submission,$price_featured_submission);
+                                        }
+                                        if($enable_direct_status=='yes'){
+                                            print '<div data-listing="'.intval($post_id).'" data-isupgrade="1" class="perpack">'.esc_html__('Upgrade to featured','wpresidence').'</div>';
+                                        }
                                     }
                                 } 
                             }
@@ -279,7 +269,7 @@ $expiration_date=$pfx_date+$free_feat_list_expiration*24*60*60;
 
         <div class="statistics_wrapper">
             <div class="statistics_wrapper_total_views">
-                <?php _e('Total number of views:','wpestate'); echo esc_html($no_views); ?>
+                <?php esc_html_e('Total number of views:','wpresidence'); echo esc_html($no_views); ?>
             </div>
             <canvas class="my_chart_dash" id="myChart_<?php echo esc_html($post_id);?>"></canvas>
         </div>   

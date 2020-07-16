@@ -1,29 +1,25 @@
 <?php
 // Template Name: User Dashboard Floor Plans
 // Wp Estate Pack
+wpestate_dashboard_header_permissions();
 
-if ( !is_user_logged_in() ) {   
-     wp_redirect(  home_url() );exit;
-} 
-
-$current_user = wp_get_current_user();  
-$paid_submission_status         =   esc_html ( get_option('wp_estate_paid_submission','') );
-$price_submission               =   floatval( get_option('wp_estate_price_submission','') );
-$submission_curency_status      =   esc_html( get_option('wp_estate_submission_curency','') );
+$current_user                   =   wp_get_current_user();  
+$paid_submission_status         =   esc_html ( wpresidence_get_option('wp_estate_paid_submission','') );
+$price_submission               =   floatval( wpresidence_get_option('wp_estate_price_submission','') );
+$submission_curency_status      =   esc_html( wpresidence_get_option('wp_estate_submission_curency','') );
 $userID                         =   $current_user->ID;
 $user_option                    =   'favorites'.$userID;
 $curent_fav                     =   get_option($user_option);
 $show_remove_fav                =   1;   
 $show_compare                   =   1;
 $show_compare_only              =   'no';
-$currency                       =   esc_html( get_option('wp_estate_currency_symbol', '') );
-$where_currency                 =   esc_html( get_option('wp_estate_where_currency_symbol', '') );
-
+$wpestate_currency              =   esc_html( wpresidence_get_option('wp_estate_currency_symbol', '') );
+$where_currency                 =   esc_html( wpresidence_get_option('wp_estate_where_currency_symbol', '') );
+$agent_list                     =   (array)get_user_meta($userID,'current_agent_list',true);
 get_header();
-$options=wpestate_page_details($post->ID);
-
-$post_id='';
-
+$wpestate_options=wpestate_page_details($post->ID);
+$post_id        =   '';
+$post_title     =   '';
 if( isset( $_GET['floor_edit'] ) && is_numeric( $_GET['floor_edit'] ) ){
    $post_id=intval( $_GET['floor_edit']);
    $post_title=get_the_title($post_id);
@@ -31,18 +27,23 @@ if( isset( $_GET['floor_edit'] ) && is_numeric( $_GET['floor_edit'] ) ){
 
 
  $the_post= get_post( $post_id); 
-    if( $current_user->ID != $the_post->post_author ) {
+ 
+    if( $current_user->ID != $the_post->post_author &&  !in_array($the_post->post_author , $agent_list)   ) {
         exit('You don\'t have the rights to edit this');
     }
 
-if( 'POST' == $_SERVER['REQUEST_METHOD'] ){
+if( isset($_POST ) && isset($_POST['dashboard_add_floor_nonce'])){
     //////////////////////////////////////////////////////////////////
     /// save floor plan
     //////////////////////////////////////////////////////////////////
     
     $floor_for_post= intval($_POST['floor_for_post']);
+
+    if (    ! isset( $_POST['dashboard_add_floor_nonce'] )  || ! wp_verify_nonce( $_POST['dashboard_add_floor_nonce'], 'dashboard_add_floor' ) ) {
+        esc_html_e('Sorry, your nonce did not verify.','wpresidence');
+        exit;
+    }
     
-   // print_R($_POST);
     
     if(isset($_POST['use_floor_plans'])){
         update_post_meta($floor_for_post, 'use_floor_plans',intval( $_POST['use_floor_plans'] ) );
@@ -117,51 +118,21 @@ if( 'POST' == $_SERVER['REQUEST_METHOD'] ){
     
     //////////////////////////////////////// end save floor plan
 }
-
-
-
-
-?> 
-
-
-
-<?php
-$current_user               =   wp_get_current_user();
-$user_custom_picture        =   get_the_author_meta( 'small_custom_picture' , $current_user->ID  );
-$user_small_picture_id      =   get_the_author_meta( 'small_custom_picture' , $current_user->ID  );
-if( $user_small_picture_id == '' ){
-
-    $user_small_picture[0]=get_template_directory_uri().'/img/default-user_1.png';
-}else{
-    $user_small_picture=wp_get_attachment_image_src($user_small_picture_id,'agent_picture_thumb');
-    
-}
 ?>
 
 
+
 <div class="row row_user_dashboard">
-    <!--<?php get_template_part('templates/breadcrumbs'); ?>-->
-     <div class="col-md-3 user_menu_wrapper">
-       <div class="dashboard_menu_user_image" style="margin-bottom:60px">
-            <div class="menu_user_picture" style="background-image: url('<?php print $user_small_picture[0];  ?>');height: 80px;width: 80px;" ></div>
-            <div class="dashboard_username">
-                <?php _e('Welcome back, ','wpestate'); echo $user_login.'!';?>
-                  <p style="color:white;font-weight: bold">[<?php  echo welcome_user_roles(); ?>]</p>
-            </div> 
-        </div>
-          <?php  get_template_part('templates/user_menu');  ?>
-    </div>  
+    <?php  get_template_part('templates/dashboard-left-col');  ?>
+
+
     <div class="col-md-9 dashboard-margin">
-    
-    
         <?php get_template_part('templates/breadcrumbs'); ?>
-        <?php  get_template_part('templates/user_memebership_profile');  ?>
+        <?php get_template_part('templates/user_memebership_profile');  ?>
         <?php get_template_part('templates/ajax_container'); ?>
-        
-        
-        
+
         <?php if (esc_html( get_post_meta($post->ID, 'page_show_title', true) ) != 'no') { ?>
-            <h3 class="entry-title"><?php the_title(); echo ' '.__('for','wpestate').' '; echo esc_html($post_title); ?></h3>
+            <h3 class="entry-title"><?php the_title(); echo ' '.esc_html__('for','wpresidence').' '; echo esc_html($post_title); ?></h3>
         <?php } ?>
         
      <div class="col-md-12 row_dasboard-prop-listing">
@@ -183,14 +154,9 @@ if( $user_small_picture_id == '' ){
         $plan_rooms_array       = get_post_meta($post_id, 'plan_rooms', true) ;
         $plan_bath_array        = get_post_meta($post_id, 'plan_bath', true);
         $plan_price_array       = get_post_meta($post_id, 'plan_price', true) ;
-        
-        //print_r($plan_title_array);
-        
-    
-     
-    
-        print '<div id="plan_wrapper"><form action="" method="POST">';
 
+        print '<div id="plan_wrapper"><form action="" method="POST">';
+         wp_nonce_field( 'dashboard_add_floor', 'dashboard_add_floor_nonce'); 
         if(is_array($plan_title_array)){
             print '<p class="meta-options"> 
                   <input type="hidden" name="use_floor_plans" value="0">
@@ -199,7 +165,7 @@ if( $user_small_picture_id == '' ){
                 if($use_floor_plans==1){
                     print ' checked="checked" ';
                 }
-            print'><label for="use_floor_plans">'.__('Use Floor Plans','wpestate').'</label>
+            print'><label for="use_floor_plans">'.esc_html__('Use Floor Plans','wpresidence').'</label>
             </p>';
         }
 
@@ -248,46 +214,46 @@ if( $user_small_picture_id == '' ){
                     $plan_price='';
                 }
 
-//user_picture_profile
+
             $preview=wp_get_attachment_image_src($plan_image_attach, 'user_picture_profile');    
             print '
             <div class="uploaded_images floor_container" data-imageid="">
-            <input type="hidden" name="plan_image_attach[]" value="'.$plan_image_attach.'">
-            <input type="hidden" name="plan_image[]" value="'.$plan_img.'">
-            <img src="'.$preview[0].'" alt="thumb"><i class="fa deleter_floor fa-trash-o"></i>
+            <input type="hidden" name="plan_image_attach[]" value="'.esc_html($plan_image_attach).'">
+            <input type="hidden" name="plan_image[]" value="'.esc_url($plan_img).'">
+            <img src="'.esc_url($preview[0]).'" alt="'.esc_html__('user image','wpresidence').'"><i class="fa deleter_floor fa-trash-o"></i>
             <div class="">
             <p class="meta-options floor_p">
-                <label for="plan_title">'.__('Plan Title','wpestate').'</label><br>
-                <input id="plan_title" type="text" size="36" name="plan_title[]" value="'.$plan_name.'" >
+                <label for="plan_title">'.esc_html__('Plan Title','wpresidence').'</label><br>
+                <input id="plan_title" type="text" size="36" name="plan_title[]" value="'.esc_html($plan_name).'" >
             </p>
             
             <p class="meta-options floor_full"> 
-                <label for="plan_description">'.__('Plan Description','wpestate').'</label><br> 
-                <textarea class="plan_description" type="text" size="36" name="plan_description[]" >'.$plan_desc.'</textarea>
+                <label for="plan_description">'.esc_html__('Plan Description','wpresidence').'</label><br> 
+                <textarea class="plan_description" type="text" size="36" name="plan_description[]" >'.esc_html($plan_desc).'</textarea>
             </p>
              
             <p class="meta-options floor_p"> 
-                <label for="plan_size">'.__('Plan Size','wpestate').'</label><br> 
-                <input id="plan_size" type="text" size="36" name="plan_size[]" value="'.$plan_size.'"> 
+                <label for="plan_size">'.esc_html__('Plan Size','wpresidence').'</label><br> 
+                <input id="plan_size" type="text" size="36" name="plan_size[]" value="'.esc_html($plan_size).'"> 
             </p> 
             
             <p class="meta-options floor_p"> 
-                <label for="plan_rooms">'.__('Plan Rooms','wpestate').'</label><br> 
-                <input id="plan_rooms" type="text" size="36" name="plan_rooms[]" value="'.$plan_rooms.'""> 
+                <label for="plan_rooms">'.esc_html__('Plan Rooms','wpresidence').'</label><br> 
+                <input id="plan_rooms" type="text" size="36" name="plan_rooms[]" value="'.esc_html($plan_rooms).'""> 
             </p> 
             <p class="meta-options floor_p"> 
-                <label for="plan_bath">'.__('Plan Bathrooms','wpestate').'</label><br> 
-                <input id="plan_bath" type="text" size="36"name="plan_bath[]" value="'.$plan_bath.'"> 
+                <label for="plan_bath">'.esc_html__('Plan Bathrooms','wpresidence').'</label><br> 
+                <input id="plan_bath" type="text" size="36"name="plan_bath[]" value="'.esc_html($plan_bath).'"> 
             </p> 
             <p class="meta-options floor_p"> 
-                <label for="plan_price">'.__('Price in ','wpestate'). esc_html( get_option('wp_estate_currency_symbol', '') ) .'</label><br> 
-                <input id="plan_price" type="text" size="36" name="plan_price[]" value="'.$plan_price.'"> 
+                <label for="plan_price">'.esc_html__('Price in ','wpresidence'). esc_html( wpresidence_get_option('wp_estate_currency_symbol', '') ) .'</label><br> 
+                <input id="plan_price" type="text" size="36" name="plan_price[]" value="'.esc_html($plan_price).'"> 
             </p> 
     </div></div>';
             }
         }else{
 
-            print '<h4 id="no_plan_mess">'.__('You don\'t have any plans attached!','wpestate').'</h4>';
+            print '<h4 id="no_plan_mess">'.esc_html__('You don\'t have any plans attached!','wpresidence').'</h4>';
 
         }
         
@@ -301,20 +267,21 @@ if( $user_small_picture_id == '' ){
 
                 <div id="imagelist">
                 <?php 
+                 $ajax_nonce = wp_create_nonce( "wpestate_image_upload" );
+                    print'<input type="hidden" id="wpestate_image_upload" value="'.esc_html($ajax_nonce).'" />    ';
                     if($images!=''){
-                        print $images;
+                        print trim($images);
                     }
                 ?>  
                 </div>
 
-                <button id="aaiu-uploader"  class="wpresidence_button wpresidence_success"><?php _e('Upload New Plan Image','wpestate');?></button>
+                <button id="aaiu-uploader"  class="wpresidence_button wpresidence_success"><?php esc_html_e('Upload New Plan Image','wpresidence');?></button>
       
         </div>  
         </div>   
-    
 
     <input type="hidden" name="floor_for_post" value="<?php print intval($post_id);?>">
-    <input type="submit" class="wpresidence_button" id="floor_submit" value="<?php _e('Save Plans','wpestate');?>">
+    <input type="submit" class="wpresidence_button" id="floor_submit" value="<?php esc_html_e('Save Plans','wpresidence');?>">
   </form>
  </div>
  </div>

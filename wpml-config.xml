@@ -10,6 +10,8 @@
     <taxonomy translate="1">property_action_category</taxonomy>
     <taxonomy translate="1">property_city</taxonomy>
     <taxonomy translate="1">property_area</taxonomy>
+    <taxonomy translate="1">property_features</taxonomy>
+    <taxonomy translate="1">property_status</taxonomy>
   </taxonomies>
   <custom-fields>
     <custom-field action="copy">agent_email</custom-field>
@@ -60,6 +62,7 @@
     <key name="wp_estate_property_features_text"/>
     <key name="wp_estate_property_features_text"/>
     <key name="wp_estate_copyright_message"/>
+    <key name="wp_estate_measure_sys"/>
   </admin-texts>
   <shortcodes>
       <shortcode>

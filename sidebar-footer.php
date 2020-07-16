@@ -1,24 +1,13 @@
 <?php
 if (!is_active_sidebar('first-footer-widget-area') && !is_active_sidebar('second-footer-widget-area') && 
-        !is_active_sidebar('third-footer-widget-area') && !is_active_sidebar('fourth-footer-widget-area')){
-  return;  
+    !is_active_sidebar('third-footer-widget-area') && !is_active_sidebar('fourth-footer-widget-area')){
+    return;  
 }
 
-$footer_type  =   get_option('wp_estate_footer_type','');
-/*
- $wide_array=array(
-        "1"  =>     __("4 equal columns","wpestate"),
-        "2"  =>     __("3 equal columns","wpestate"),
-        "3"  =>     __("2 equal columns","wpestate"),
-        "4"  =>     __("1 100% width column","wpestate"),
-        "5"  =>     __("3 columns: 1/2 + 1/4 + 1/4","wpestate"),
-        "6"  =>     __("3 columns: 1/4 + 1/2 + 1/4","wpestate"),
-        "7"  =>     __("3 columns: 1/4 + 1/4 + 1/2","wpestate"),
-        "8"  =>     __("2 columns: 2/3 + 1/3","wpestate"),
-        "9"  =>     __("2 columns: 1/3 + 2/3","wpestate"),
-        );
-     */
-
+$footer_type  =   wpresidence_get_option('wp_estate_footer_type','');
+if($footer_type==''){
+    $footer_type=1;
+}
 
 $class1 =   '';
 $class2 =   '';
@@ -82,50 +71,36 @@ switch ($footer_type) {
         break;
     
 }
-
-
 ?>
 
-
-
 <?php if (is_active_sidebar('first-footer-widget-area') && $class1!='' ) : ?>
-    <div id="first" class="widget-area <?php echo $class1;?> ">
+    <div id="first" class="widget-area <?php print esc_attr($class1);?> ">
         <ul class="xoxo">
             <?php dynamic_sidebar('first-footer-widget-area'); ?>
         </ul>
     </div><!-- #first .widget-area -->
 <?php endif; ?>
-
-    
     
 <?php if (is_active_sidebar('second-footer-widget-area') && $class2!='' ) : ?>
-    <div id="second" class="widget-area <?php echo $class2;?>">
+    <div id="second" class="widget-area <?php print esc_attr($class2);?>">
         <ul class="xoxo">
         <?php dynamic_sidebar('second-footer-widget-area'); ?>
         </ul>
     </div><!-- #second .widget-area -->
 <?php endif; ?>
-
-    
-    
     
 <?php if (is_active_sidebar('third-footer-widget-area') && $class3!='') : ?>
-    <div id="third" class="widget-area <?php echo $class3;?>">
+    <div id="third" class="widget-area <?php print esc_attr($class3);?>">
         <ul class="xoxo">
         <?php dynamic_sidebar('third-footer-widget-area'); ?>
         </ul>
     </div><!-- #third .widget-area -->
 <?php endif; ?>
     
-    
-    
-
 <?php if ( is_active_sidebar('fourth-footer-widget-area') && $class4!='' ) : ?>
-    <div id="fourth" class="widget-area <?php echo $class4;?>">
+    <div id="fourth" class="widget-area <?php print esc_attr($class4);?>">
         <ul class="xoxo">
         <?php dynamic_sidebar('fourth-footer-widget-area'); ?>
         </ul>
     </div><!-- #fourth .widget-area -->
 <?php endif; ?>
-
-
